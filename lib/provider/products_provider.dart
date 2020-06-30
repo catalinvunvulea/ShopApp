@@ -40,14 +40,29 @@ class Products with ChangeNotifier {
     ),
   ];
 
+  var _showFavouritesOnly = false;
+
   List<Product> get items {
-    return [
-      ..._items
-    ]; //this is how we return a copy of the items = [...value ]
+    if (_showFavouritesOnly) {
+      return _items
+          .where((element) => element.isFavourie == _showFavouritesOnly)
+          .toList();
+    }
+    return [..._items]; //this is how we return a copy of the items = [...value ]
   }
 
   void addProducts() {
     // _items.add(value);
+    notifyListeners();
+  }
+
+  void showFavouritesOnly() {
+    _showFavouritesOnly = true;
+    notifyListeners();
+  }
+
+  void showAll() {
+    _showFavouritesOnly = false;
     notifyListeners();
   }
 

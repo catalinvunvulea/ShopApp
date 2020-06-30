@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/products_provider.dart';
 import '../widgets/products_grid.dart';
 
 enum FilteredOptions {
@@ -10,6 +13,7 @@ enum FilteredOptions {
 class ProductsOverviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+     final productData = Provider.of<Products>(context, listen: false);
     var scaffold = Scaffold(
       appBar: AppBar(
         title: Text('My shop'),
@@ -17,9 +21,9 @@ class ProductsOverviewScreen extends StatelessWidget {
           PopupMenuButton(
             onSelected: (FilteredOptions selectedValue) {
               if (selectedValue == FilteredOptions.Favourites) {
-              //...do something
+              productData.showFavouritesOnly();
               } else {
-              //...do something else
+              productData.showAll();
               }
             },
             color: Colors.yellow[50],
