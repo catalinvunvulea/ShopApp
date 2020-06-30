@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../model/product.dart';
 
-class Products with ChangeNotifier { //with = light enharitance; ChangeNotifier is built in the provider (added in pubspec, available https://pub.dev/packages/provider#-installing-tab-)
+class Products with ChangeNotifier {
+  //with = light enharitance; ChangeNotifier is built in the provider (added in pubspec, available https://pub.dev/packages/provider#-installing-tab-)
 
- List<Product> _items = [
-
+  List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -40,13 +40,18 @@ class Products with ChangeNotifier { //with = light enharitance; ChangeNotifier 
     ),
   ];
 
- List<Product> get items {
-   return [..._items]; //this is how we return a copy of the items = [...value ]
- }
+  List<Product> get items {
+    return [
+      ..._items
+    ]; //this is how we return a copy of the items = [...value ]
+  }
 
- void addProducts() {
-  // _items.add(value);
-  notifyListeners();
- }
+  void addProducts() {
+    // _items.add(value);
+    notifyListeners();
+  }
 
+  Product findById(String id) {
+    return _items.firstWhere((element) => element.id == id);
+  }
 }

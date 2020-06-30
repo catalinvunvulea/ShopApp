@@ -1,16 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/products_provider.dart';
 import '../widgets/product_item.dart';
 
-
 class ProductsGrid extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
-    final productsData =Provider.of<Products>(context); //it will check all his parrents if they have a ChangeNotifierProvider for Produccts, and we have on in main
+    final productsData = Provider.of<Products>(
+        context); //it will check all his parrents if they have a ChangeNotifierProvider for Produccts, and we have on in main
     final products = productsData.items;
     return GridView.builder(
       padding: const EdgeInsets.all(15),
@@ -21,11 +19,14 @@ class ProductsGrid extends StatelessWidget {
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
-      itemBuilder: (ctx, index) => ProductItem(
-        products[index].id,
-        products[index].title,
-        products[index].imageUrl,
-       ),
+      itemBuilder: (ctx, index) => ChangeNotifierProvider(
+        create: (ctx) => products[index],
+        child: ProductItem(
+          // products[index].id,
+          // products[index].title,
+          // products[index].imageUrl,
+        ),
+      ),
       itemCount: products.length,
     );
   }
