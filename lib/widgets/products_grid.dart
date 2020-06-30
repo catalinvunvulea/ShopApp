@@ -5,11 +5,16 @@ import '../provider/products_provider.dart';
 import '../widgets/product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
+
+  final bool showOnlyFavourites; 
+
+  ProductsGrid(this.showOnlyFavourites);
+
   @override
   Widget build(BuildContext context) {
     final productsData = Provider.of<Products>(
         context); //it will check all his parrents if they have a ChangeNotifierProvider for Produccts, and we have on in main
-    final products = productsData.items;
+    final products = showOnlyFavourites ? productsData.favouriteItems : productsData.items;
     return GridView.builder(
       padding: const EdgeInsets.all(15),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

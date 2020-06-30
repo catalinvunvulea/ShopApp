@@ -43,28 +43,34 @@ class Products with ChangeNotifier {
   var _showFavouritesOnly = false;
 
   List<Product> get items {
-    if (_showFavouritesOnly) {
-      return _items
-          .where((element) => element.isFavourie == _showFavouritesOnly)
-          .toList();
-    }
-    return [..._items]; //this is how we return a copy of the items = [...value ]
+    // if (_showFavouritesOnly) {
+    //   return _items
+    //       .where((element) => element.isFavourie == _showFavouritesOnly)
+    //       .toList();
+    // }
+    return [
+      ..._items
+    ]; //this is how we return a copy of the items = [...value ]
+  }
+
+  List<Product> get favouriteItems {
+    return _items.where((element) => element.isFavourie).toList();
   }
 
   void addProducts() {
     // _items.add(value);
     notifyListeners();
   }
+//comented as we should not set this globally
+  // void showFavouritesOnly() {
+  //   _showFavouritesOnly = true;
+  //   notifyListeners();
+  // }
 
-  void showFavouritesOnly() {
-    _showFavouritesOnly = true;
-    notifyListeners();
-  }
-
-  void showAll() {
-    _showFavouritesOnly = false;
-    notifyListeners();
-  }
+  // void showAll() {
+  //   _showFavouritesOnly = false;
+  //   notifyListeners();
+  // }
 
   Product findById(String id) {
     return _items.firstWhere((element) => element.id == id);
