@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../model/product.dart';
-import './product_item.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -18,7 +17,8 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    final product = Provider.of<Product>(context, listen: false);
+    print('product rebuilt');
     return ClipRRect(
       //used to force borderRadius to all it's children
       borderRadius: BorderRadius.circular(10),
@@ -36,13 +36,15 @@ class ProductItem extends StatelessWidget {
           ),
         ),
         footer: GridTileBar(
-          leading: IconButton(
-            icon: Icon(
-              product.isFavourie ? Icons.favorite : Icons.favorite_border,
+          leading: Consumer<Product>( //Consumer, like a provider, always listen to changes and will rebuild only what he returns => widget (shrink the area), unlike the Provider; add any widget to Consumer child and it won't change
+            builder: (ctx, product, child) => IconButton(
+              icon: Icon(
+                product.isFavourie ? Icons.favorite : Icons.favorite_border,
+              ),
+              onPressed: () {
+                product.toggleFavouriteStatus();
+              },
             ),
-            onPressed: () {
-              product.toggleFavouriteStatus();
-            },
           ),
           title: FittedBox(
             child: Text(
