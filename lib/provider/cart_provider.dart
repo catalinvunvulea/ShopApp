@@ -22,6 +22,12 @@ class Cart with ChangeNotifier {
     return total;
   }
 
+  void removeItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+
+  }
+
   void addItem(String productId, double price, String title) {
     if (_items.containsKey(productId)) {
       //using the key (in this case the id), we check if the Map already contains this product

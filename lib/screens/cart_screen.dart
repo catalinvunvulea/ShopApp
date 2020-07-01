@@ -51,6 +51,7 @@ class CartScreen extends StatelessWidget {
               child: ListView.builder(
             itemBuilder: (ctx, index) => CartItem(
               id: cart.items.values.toList()[index].cartId, //we use values.toList as we access a Map(dictionary), and in the Map we need to access all the cartId and add them in a list(array), and then with the index pic the right value
+              productId: cart.items.keys.toList()[index],
               title: cart.items.values.toList()[index].title,
               price: cart.items.values.toList()[index].price,
               quantity: cart.items.values.toList()[index].quantity,
