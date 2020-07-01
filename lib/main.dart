@@ -4,8 +4,10 @@ import 'package:provider/provider.dart'; //enable us to set a provider
 
 import './screens/products_overview_screen.dart';
 import './screens/product_detail_screen.dart';
+import './screens/cart_screen.dart';
 import './provider/products_provider.dart';
 import './provider/cart_provider.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -34,8 +36,9 @@ class MyApp extends StatelessWidget {
         ),
         home: ProductsOverviewScreen(),
         routes: {
-          ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-        },
+         ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+         CartScreen.routeName: (ctx) => CartScreen(),
+       },
       ),
     );
   }

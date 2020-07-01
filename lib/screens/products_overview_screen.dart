@@ -5,6 +5,7 @@ import '../provider/products_provider.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/badge.dart';
 import '../provider/cart_provider.dart';
+import './cart_screen.dart';
 
 enum FilteredOptions {
   Favourites, // =0
@@ -55,7 +56,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             ),
             child: IconButton( //this is the child of the consumner (named ChildX by me)
                 icon: Icon(Icons.shopping_cart),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(CartScreen.routeName);
+                },
               ),
           ),
         ],
