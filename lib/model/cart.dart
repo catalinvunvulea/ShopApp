@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class CartItem {
+class CartItemM {
   final String cartId;
   final String title;
   final int quantity;
   final double price;
 
-  CartItem({
+  CartItemM({
     @required this.cartId,
     @required this.title,
     @required this.quantity,
