@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../provider/products_provider.dart';
 import '../widgets/products_grid.dart';
+import '../widgets/badge.dart';
+import '../provider/cart_provider.dart';
 
 enum FilteredOptions {
   Favourites, // =0
@@ -43,6 +46,17 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 value: FilteredOptions.All,
               ),
             ],
+          ),
+          Consumer<Cart>(
+            //use Consumer instead of Provider as we only wish to rebuid the child widget
+            builder: (ctx, cart, childX) => Badge( //childX is the Consumer's child, and we use it as we don't want to rebuild the Icon because the Bedge is changing
+              child: childX,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton( //this is the child of the consumner (named ChildX by me)
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {},
+              ),
           ),
         ],
       ),

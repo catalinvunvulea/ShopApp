@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../model/product.dart';
+import '../provider/cart_provider.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -18,7 +19,8 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
-    print('product rebuilt');
+    final cart = Provider.of<Cart>(context, listen: false); // listen = false => I am not interested to rebuilt the screen when changes occur
+    
     return ClipRRect(
       //used to force borderRadius to all it's children
       borderRadius: BorderRadius.circular(10),
@@ -54,7 +56,9 @@ class ProductItem extends StatelessWidget {
           ),
           trailing: IconButton(
             icon: Icon(Icons.shopping_cart),
-            onPressed: () {},
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+            },
           ),
           backgroundColor: Colors.black87,
         ),
