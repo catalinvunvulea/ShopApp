@@ -9,7 +9,16 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
   final _priceFocusNode =
-      FocusNode(); //object that can be used by statefull widgets to obtain keyboard focus and keybod events
+      FocusNode(); //object that can be used by statefull widgets to obtain keyboard focus and keybod events (like an identifier) / see where is called
+  final _descriptionFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _priceFocusNode.dispose(); //once we leave the screen we always have to despose FocusNodes otherwise they will stick in the memory 
+    _descriptionFocusNode.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +32,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
               children: <Widget>[
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Title'),
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction
+                      .next, //what to show on the keyboard [ok btn] (next, new line)
                   onFieldSubmitted: (_) {
                     //action of the ok/done button from the keyboard
                     FocusScope.of(context).requestFocus(
@@ -35,6 +45,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.number,
                   focusNode: _priceFocusNode, // kind of a identifier**
+                  onFieldSubmitted: (_) {
+                    FocusScope.of(context).requestFocus(_descriptionFocusNode);
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Description'),
+                  keyboardType: TextInputType
+                      .multiline, //give a enter symbol on the keyboard
+                  maxLines:
+                      3, //no of lines shown on the screen (you can write more, but you will have to scroll to see them)
+                  focusNode: _descriptionFocusNode,
                 ),
               ],
             ),
