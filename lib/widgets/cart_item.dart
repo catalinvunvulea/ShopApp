@@ -46,13 +46,13 @@ class CartItem extends StatelessWidget {
               FlatButton(
                 child: Text('NO'),
                 onPressed: () {
-                  Navigator.of(ctx).pop(false); //to close the dialog window and return
+                  Navigator.of(ctx).pop(false); //to close the dialog window and return; false, to return it to the confirmDismiss
                 },
               ),
               FlatButton(
                 child: Text('YES'),
                 onPressed: () {
-                  Navigator.of(ctx).pop(true);
+                  Navigator.of(ctx).pop(true); //true, as we wish to dismiss
                 },
               )
             ],
