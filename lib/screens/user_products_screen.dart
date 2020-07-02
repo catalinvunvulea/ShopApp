@@ -2,6 +2,7 @@ import 'package:ShopApp/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/edit_product_screen.dart';
 import '../provider/products_provider.dart';
 import '../widgets/user_product_item.dart';
 
@@ -20,7 +21,7 @@ static const routeName = '/user-products-screen';
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              //TO DO:...navigate to new product screen
+              Navigator.of(context).pushNamed(EditProductScreen.rotueName);
             },
           )
         ],
