@@ -33,6 +33,32 @@ class CartItem extends StatelessWidget {
           vertical: 5,
         ),
       ),
+      confirmDismiss: (direction) {
+        return showDialog(
+          //widget to show a message/allert; returns a Future whenever the dialog is cloed
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('Do you want to remove the item from the cart?'),
+            //backgroundColor: Colors.yellow[50],
+            elevation: 10,
+            actions: <Widget>[
+              FlatButton(
+                child: Text('NO'),
+                onPressed: () {
+                  Navigator.of(ctx).pop(false); //to close the dialog window and return
+                },
+              ),
+              FlatButton(
+                child: Text('YES'),
+                onPressed: () {
+                  Navigator.of(ctx).pop(true);
+                },
+              )
+            ],
+          ),
+        );
+      },
       onDismissed: (dismissDirection) {
         Provider.of<Cart>(
           context,
