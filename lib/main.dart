@@ -1,4 +1,3 @@
-import 'package:ShopApp/screens/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; //enable us to set a provider
 
@@ -8,6 +7,7 @@ import './screens/cart_screen.dart';
 import './provider/products_provider.dart';
 import './provider/cart_provider.dart';
 import './provider/orders_provider.dart';
+import './screens/orders_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
         routes: {
           ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
           CartScreen.routeName: (ctx) => CartScreen(),
+          OrdersScreen.routeName: (ctx) => OrdersScreen(),
         },
       ),
     );

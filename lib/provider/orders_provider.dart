@@ -4,16 +4,16 @@ import '../model/cart.dart';
 import '../model/orders.dart';
 
 class Orders with ChangeNotifier {
-  List<OrderItem> _orders = [];
+  List<OrderItemM> _orders = [];
 
-  List<OrderItem> get orders {
+  List<OrderItemM> get orders {
     return [..._orders];
   }
 
   void addOrder(List<CartItemM> cartProducts, double total) {
     _orders.insert(
       0,
-      OrderItem(
+      OrderItemM(
         id: DateTime.now().toString(),
         amount: total,
         dateTime: DateTime.now(),
