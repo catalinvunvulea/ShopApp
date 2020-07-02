@@ -32,7 +32,7 @@ class CartScreen extends StatelessWidget {
                   Spacer(), //takes all the space available between widgets
                   Chip(
                     label: Text(
-                      '£ ${cart.totalAmount}',
+                      '£ ${cart.totalAmount.toStringAsFixed(2)}', //toStringAsFixed(2) = show 2 decimals only
                       style: TextStyle(color: Colors.white),
                     ),
                     backgroundColor: Theme.of(context).primaryColor,

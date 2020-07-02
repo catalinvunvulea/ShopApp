@@ -32,11 +32,18 @@ class Products with ChangeNotifier {
     ),
     Product(
       id: 'p4',
-      title: 'A Pan',
+      title: 'Pan',
       description: 'Prepare any meal you want.',
       price: 49.99,
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+    ),
+    Product(
+      id: 'p5',
+      title: 'Bike',
+      description: 'Great for excercice anywhere and anytime you want!',
+      price: 549.99,
+      imageUrl:'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'
     ),
   ];
 

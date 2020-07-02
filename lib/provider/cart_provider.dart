@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../model/cart.dart';
 
 class Cart with ChangeNotifier {
-  Map<String, CartItemM> _items ={}; //it is initialised as emty for the addItem func to work (not to return a null)
+  Map<String, CartItemM> _items =
+      {}; //it is initialised as emty for the addItem func to work (not to return a null)
 
   Map<String, CartItemM> get items {
     return {..._items}; //as it returns a map we use {}
@@ -11,12 +12,11 @@ class Cart with ChangeNotifier {
 
   int get itemCount {
     return _items.length;
-
   }
 
   double get totalAmount {
     var total = 0.0;
-    _items.forEach((key, cartItem) { 
+    _items.forEach((key, cartItem) {
       total += cartItem.price * cartItem.quantity;
     });
     return total;
@@ -32,12 +32,34 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return; //don't do anything
+    }
+    if (_items[productId].quantity > 1) {
+      _items.update(
+        productId,
+        (existingItem) => CartItemM(
+          cartId: existingItem.cartId,
+          title: existingItem.title,
+          quantity: existingItem.quantity - 1,
+          price: existingItem.price,
+        ),
+      );
+    } else {
+      _items.remove(productId);
+    }
+    notifyListeners();
+  }
+
   void addItem(String productId, double price, String title) {
     if (_items.containsKey(productId)) {
       //using the key (in this case the id), we check if the Map already contains this product
-      _items.update( //we update the existing product, we don't add another one
+      _items.update(
+        //we update the existing product, we don't add another one
         productId, //use to identify the product
-        (existingCartItem) => CartItemM( //everithing remains the same but the qty increases by 1
+        (existingCartItem) => CartItemM(
+          //everything remains the same but the qty increases by 1
           cartId: existingCartItem.cartId,
           title: existingCartItem.title,
           price: existingCartItem.price,
