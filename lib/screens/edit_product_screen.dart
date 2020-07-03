@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../model/product.dart';
+
 class EditProductScreen extends StatefulWidget {
   static const rotueName = '/edit-product-screen';
 
@@ -14,12 +16,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _imageUrlController =
       TextEditingController(); //we need acces to the user input Url to see the picture (before the form is submited; once the form is submitted, we would have acces without this controller)
   final _imageUrlFocusNode = FocusNode();
+  final _form = GlobalKey<
+      FormState>(); //rarely used, usually when you have to interact with a widget from inside your code (mostly with form widgets), it's a generic type and you need to tell it which data it will refer to, so it can hook into the state of that widget <FormState>
+  var _editedProduct = Product(
+    id: null,
+    title: '',
+    description: '',
+    imageUrl: '',
+    price: 0,
+  );
 
   @override
   void initState() {
     super.initState();
-    _imageUrlFocusNode.addListener(_updateImageUrl); //we will run the _updateImageUrl func when the focus is moved from _imageUrlFocusNode
-
+    _imageUrlFocusNode.addListener(
+        _updateImageUrl); //we will run the _updateImageUrl func when the focus is moved from _imageUrlFocusNode
   }
 
   @override
@@ -34,11 +45,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _updateImageUrl() {
-    if (!_imageUrlFocusNode.hasFocus) { //if the focus (user tapped somewhere else) was moved from this textFormField, we rebuild the screen so we can see the image
-    setState(() {
-    });
+    if (!_imageUrlFocusNode.hasFocus) {
+      //if the focus (user tapped somewhere else) was moved from this textFormField, we rebuild the screen so we can see the image
+      setState(() {});
     }
+  }
 
+  void _saveForm() {
+    _form.currentState
+        .save(); //this metod alows you to take and use the values entered in the TextFormFields (from the List) - access "onSaved" of each TextFormFields
+        print(_editedProduct.title);
+        print(_editedProduct.description);
+        print(_editedProduct.price);
+        print(_editedProduct.imageUrl);
   }
 
   @override
@@ -46,11 +65,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Edit product'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.save,
+                color: Colors.white,
+              ),
+              onPressed: _saveForm,
+            )
+          ],
         ),
         body: Padding(
           padding: EdgeInsets.all(16),
           child: Form(
             //gives you acces to the values of the user Input (of TextFormField) without having to add your own textEditinControllers
+            key: _form,
             child: ListView(
               children: <Widget>[
                 TextFormField(
@@ -62,7 +91,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     FocusScope.of(context).requestFocus(
                         _priceFocusNode); //we tell the cursore to jump to a different TextFormField when action btn from keybord press (in this case it wil jump to _priceFocusNode)
                   },
-                ), //controlls the action  button (only the display, not the aciton yet)from the keyoard as an ok, next, done. submit etc
+                  onSaved: (value) {//this is communicating with _form.currentState.save()
+                    _editedProduct = Product(
+                        //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
+                        id: null,
+                        title: value,
+                        description: _editedProduct.description,
+                        price: _editedProduct.price,
+                        imageUrl: _editedProduct.imageUrl);
+                  },
+                ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Price'),
                   textInputAction: TextInputAction.next,
@@ -70,6 +108,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   focusNode: _priceFocusNode, // kind of a identifier**
                   onFieldSubmitted: (_) {
                     FocusScope.of(context).requestFocus(_descriptionFocusNode);
+                  },
+                  onSaved: (value) {
+                    _editedProduct = Product(
+                        id: null,
+                        title: _editedProduct.title,
+                        description: _editedProduct.description,
+                        price: double.parse(value),
+                        imageUrl: _editedProduct.imageUrl);
                   },
                 ),
                 TextFormField(
@@ -79,6 +125,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   maxLines:
                       3, //no of lines shown on the screen (you can write more, but you will have to scroll to see them)
                   focusNode: _descriptionFocusNode,
+                  onSaved: (value) {
+                    _editedProduct = Product(
+                        id: null,
+                        title: _editedProduct.title,
+                        description: value,
+                        price: _editedProduct.price,
+                        imageUrl: _editedProduct.imageUrl);
+                  },
                 ),
                 Row(
                   // has an unconstrainer width
@@ -111,7 +165,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         textInputAction: TextInputAction.done,
                         controller:
                             _imageUrlController, //we need to use the value before the form is subbmited, hence we add a controller (to use the value Inputed by user)
-                        focusNode: _imageUrlFocusNode, //in this case we add the focusNode to know when the user unselected this text field, for that we need a listener, added in the init state
+                        focusNode:
+                            _imageUrlFocusNode, //in this case we add the focusNode to know when the user unselected this text field, for that we need a listener, added in the init state
+                        onFieldSubmitted: (_) =>
+                            _saveForm(), //when done btn from keybord is pressed (for this textFieldForm only)
+                        onSaved: (value) {
+                          _editedProduct = Product(
+                              id: null,
+                              title: _editedProduct.title,
+                              description: _editedProduct.description,
+                              price: _editedProduct.price,
+                              imageUrl: value);
+                        },
                       ),
                     ),
                   ],
