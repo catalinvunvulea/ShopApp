@@ -34,6 +34,7 @@ static const routeName = '/user-products-screen';
             itemBuilder: (ctx, index) => UserProducItem(
               productsData.items[index].title,
               productsData.items[index].imageUrl,
+              productsData.items[index].id,
             ),
           ),
         ),
