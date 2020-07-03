@@ -28,6 +28,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     price: 0,
   );
 
+  var _isLoading = false; //when true, will show loadingIndicator
   var _isInit = true; // change to false after line of code ran
   var _initValue = {
     //created to populate the screen when we come from Edit and not from Create
@@ -96,6 +97,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
+    setState(() {
+      _isLoading = true;
+    });
     final _isValid = _form.currentState
         .validate(); //trigger all the validaters from the form
     if (!_isValid) {
@@ -107,11 +111,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
       //to avoid saving the edited item as a new one, if we have id, it means we only edit and not create a new one
       Provider.of<Products>(context, listen: false)
           .updateProducts(_editedProduct.id, _editedProduct);
+      _isLoading = false; //before the screen quit
+      Navigator.of(context).pop(); //leave the page
     } else {
       // else we add a new product
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<Products>(context, listen: false)
+          .addProduct(_editedProduct)
+          .then((_) {
+        //then, as we wish to leave the page only once the product was added
+        _isLoading = false; //before the screen quit
+        Navigator.of(context).pop(); //leave the page
+      });
     }
-    Navigator.of(context).pop(); //leave the page
   }
 
   @override
@@ -129,173 +140,181 @@ class _EditProductScreenState extends State<EditProductScreen> {
             )
           ],
         ),
-        body: Padding(
-          padding: EdgeInsets.all(16),
-          child: Form(
-            //gives you acces to the values of the user Input (of TextFormField) without having to add your own textEditinControllers
-            key: _form,
-            child: ListView(
-              children: <Widget>[
-                TextFormField(
-                  initialValue: _initValue[
-                      'title'], //this will be emty if we don't receive data from previous screen (we access the map _initValue, key title)
-                  decoration: InputDecoration(
-                    labelText: 'Title',
-                    errorStyle: TextStyle(color: Colors.redAccent),
-                  ),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      //if user hasn't added a value
-                      return 'Please add a Title'; //can be formated where Text Title is added (errorStyle)
-                    }
-                    return null; // = doesn't do anything
-                  },
-                  textInputAction: TextInputAction
-                      .next, //what to show on the keyboard [ok btn] (next, new line)
-                  onFieldSubmitted: (_) {
-                    //action of the ok/done button from the keyboard
-                    FocusScope.of(context).requestFocus(
-                        _priceFocusNode); //we tell the cursore to jump to a different TextFormField when action btn from keybord press (in this case it wil jump to _priceFocusNode)
-                  },
-                  onSaved: (value) {
-                    //this is communicating with _form.currentState.save()
-                    _editedProduct = Product(
-                        //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
-                        id: _editedProduct.id,
-                        isFavourie: _editedProduct.isFavourie,
-                        title: value,
-                        description: _editedProduct.description,
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl);
-                  },
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
-                TextFormField(
-                  initialValue: _initValue['price'],
-                  decoration: InputDecoration(labelText: 'Price'),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please add a price';
-                    }
-                    if (double.tryParse(value) == null) {
-                      //Double.tryParse(value) return a null if value is not double
-                      return 'Please enter a valid number';
-                    }
-                    if (double.parse(value) <= 0) {
-                      return 'Plese enter a number greater  than 0';
-                    }
-                    return null; //if we pass all these checkes, we return null/nothing
-                  },
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.number,
-                  focusNode: _priceFocusNode, // kind of a identifier**
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_descriptionFocusNode);
-                  },
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: _editedProduct.id,
-                        isFavourie: _editedProduct.isFavourie,
-                        title: _editedProduct.title,
-                        description: _editedProduct.description,
-                        price: double.parse(value),
-                        imageUrl: _editedProduct.imageUrl);
-                  },
-                ),
-                TextFormField(
-                  initialValue: _initValue['descrition'],
-                  decoration: InputDecoration(labelText: 'Description'),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter a description';
-                    }
-                    if (value.length < 10) {
-                      return 'Please enter a description longer than 10 characters';
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType
-                      .multiline, //give a enter symbol on the keyboard
-                  maxLines:
-                      3, //no of lines shown on the screen (you can write more, but you will have to scroll to see them)
-                  focusNode: _descriptionFocusNode,
-                  onSaved: (value) {
-                    _editedProduct = Product(
-                        id: _editedProduct.id,
-                        isFavourie: _editedProduct.isFavourie,
-                        title: _editedProduct.title,
-                        description: value,
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl);
-                  },
-                ),
-                Row(
-                  // has an unconstrainer width
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      width: 100,
-                      height: 100,
-                      margin: EdgeInsets.only(top: 8, right: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.grey,
+              )
+            : Padding(
+                padding: EdgeInsets.all(16),
+                child: Form(
+                  //gives you acces to the values of the user Input (of TextFormField) without having to add your own textEditinControllers
+                  key: _form,
+                  child: ListView(
+                    children: <Widget>[
+                      TextFormField(
+                        initialValue: _initValue[
+                            'title'], //this will be emty if we don't receive data from previous screen (we access the map _initValue, key title)
+                        decoration: InputDecoration(
+                          labelText: 'Title',
+                          errorStyle: TextStyle(color: Colors.redAccent),
                         ),
-                      ),
-                      child: _imageUrlController.text.isEmpty
-                          ? Center(child: Text('Enter a URL'))
-                          : FittedBox(
-                              child: Image.network(
-                                _imageUrlController.text,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        //takes all the available width, and as it is in a row, we need to wrap in Expanded
-                        // initialValue: _initValue['imageUrl'], // we can't add initialValue from here if we have a controller in this TextFormatField, instead we set initial value form the controller
-                        decoration: InputDecoration(hintText: 'Image Url'),
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Please add a image URL';
+                            //if user hasn't added a value
+                            return 'Please add a Title'; //can be formated where Text Title is added (errorStyle)
                           }
-                          if (!value.startsWith('http') &&
-                              !value.startsWith('https')) {
-                            return "This filed should only contain URL's";
-                          }
-
-                          if (!value.endsWith('.png') &&
-                              (!value.endsWith('.jpg')) &&
-                              (!value.endsWith('.jpeg'))) {
-                            return 'The URL should contain an immage address';
-                          }
-                          return null;
+                          return null; // = doesn't do anything
                         },
-                        keyboardType: TextInputType.url,
-                        textInputAction: TextInputAction.done,
-                        controller:
-                            _imageUrlController, //we need to use the value before the form is subbmited, hence we add a controller (to use the value Inputed by user)
-                        focusNode:
-                            _imageUrlFocusNode, //in this case we add the focusNode to know when the user unselected this text field, for that we need a listener, added in the init state
-                        onFieldSubmitted: (_) =>
-                            _saveForm(), //when done btn from keybord is pressed (for this textFieldForm only)
+                        textInputAction: TextInputAction
+                            .next, //what to show on the keyboard [ok btn] (next, new line)
+                        onFieldSubmitted: (_) {
+                          //action of the ok/done button from the keyboard
+                          FocusScope.of(context).requestFocus(
+                              _priceFocusNode); //we tell the cursore to jump to a different TextFormField when action btn from keybord press (in this case it wil jump to _priceFocusNode)
+                        },
+                        onSaved: (value) {
+                          //this is communicating with _form.currentState.save()
+                          _editedProduct = Product(
+                              //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
+                              id: _editedProduct.id,
+                              isFavourie: _editedProduct.isFavourie,
+                              title: value,
+                              description: _editedProduct.description,
+                              price: _editedProduct.price,
+                              imageUrl: _editedProduct.imageUrl);
+                        },
+                      ),
+                      TextFormField(
+                        initialValue: _initValue['price'],
+                        decoration: InputDecoration(labelText: 'Price'),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please add a price';
+                          }
+                          if (double.tryParse(value) == null) {
+                            //Double.tryParse(value) return a null if value is not double
+                            return 'Please enter a valid number';
+                          }
+                          if (double.parse(value) <= 0) {
+                            return 'Plese enter a number greater  than 0';
+                          }
+                          return null; //if we pass all these checkes, we return null/nothing
+                        },
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.number,
+                        focusNode: _priceFocusNode, // kind of a identifier**
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context)
+                              .requestFocus(_descriptionFocusNode);
+                        },
                         onSaved: (value) {
                           _editedProduct = Product(
                               id: _editedProduct.id,
                               isFavourie: _editedProduct.isFavourie,
                               title: _editedProduct.title,
                               description: _editedProduct.description,
-                              price: _editedProduct.price,
-                              imageUrl: value);
+                              price: double.parse(value),
+                              imageUrl: _editedProduct.imageUrl);
                         },
                       ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        ));
+                      TextFormField(
+                        initialValue: _initValue['descrition'],
+                        decoration: InputDecoration(labelText: 'Description'),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter a description';
+                          }
+                          if (value.length < 10) {
+                            return 'Please enter a description longer than 10 characters';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType
+                            .multiline, //give a enter symbol on the keyboard
+                        maxLines:
+                            3, //no of lines shown on the screen (you can write more, but you will have to scroll to see them)
+                        focusNode: _descriptionFocusNode,
+                        onSaved: (value) {
+                          _editedProduct = Product(
+                              id: _editedProduct.id,
+                              isFavourie: _editedProduct.isFavourie,
+                              title: _editedProduct.title,
+                              description: value,
+                              price: _editedProduct.price,
+                              imageUrl: _editedProduct.imageUrl);
+                        },
+                      ),
+                      Row(
+                        // has an unconstrainer width
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Container(
+                            width: 100,
+                            height: 100,
+                            margin: EdgeInsets.only(top: 8, right: 10),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            child: _imageUrlController.text.isEmpty
+                                ? Center(child: Text('Enter a URL'))
+                                : FittedBox(
+                                    child: Image.network(
+                                      _imageUrlController.text,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              //takes all the available width, and as it is in a row, we need to wrap in Expanded
+                              // initialValue: _initValue['imageUrl'], // we can't add initialValue from here if we have a controller in this TextFormatField, instead we set initial value form the controller
+                              decoration:
+                                  InputDecoration(hintText: 'Image Url'),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please add a image URL';
+                                }
+                                if (!value.startsWith('http') &&
+                                    !value.startsWith('https')) {
+                                  return "This filed should only contain URL's";
+                                }
+
+                                if (!value.endsWith('.png') &&
+                                    (!value.endsWith('.jpg')) &&
+                                    (!value.endsWith('.jpeg'))) {
+                                  return 'The URL should contain an immage address';
+                                }
+                                return null;
+                              },
+                              keyboardType: TextInputType.url,
+                              textInputAction: TextInputAction.done,
+                              controller:
+                                  _imageUrlController, //we need to use the value before the form is subbmited, hence we add a controller (to use the value Inputed by user)
+                              focusNode:
+                                  _imageUrlFocusNode, //in this case we add the focusNode to know when the user unselected this text field, for that we need a listener, added in the init state
+                              onFieldSubmitted: (_) =>
+                                  _saveForm(), //when done btn from keybord is pressed (for this textFieldForm only)
+                              onSaved: (value) {
+                                _editedProduct = Product(
+                                    id: _editedProduct.id,
+                                    isFavourie: _editedProduct.isFavourie,
+                                    title: _editedProduct.title,
+                                    description: _editedProduct.description,
+                                    price: _editedProduct.price,
+                                    imageUrl: value);
+                              },
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ));
   }
 }
