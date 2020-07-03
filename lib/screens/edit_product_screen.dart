@@ -47,7 +47,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
       //if the focus (user tapped somewhere else) was moved from this textFormField, we rebuild the screen so we can see the image
-      setState(() {});
+      if ((!_imageUrlController.text.startsWith('http') ||
+              !_imageUrlController.text.startsWith('https')) ||
+          (!_imageUrlController.text.endsWith('.png')) ||
+          (!_imageUrlController.text.endsWith('.jpg')) ||
+          (!_imageUrlController.text.endsWith('.jpeg'))) {
+        return;
+      }
+      setState(() {
+        
+      });
     }
   }
 
@@ -121,12 +130,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Price'),
                   validator: (value) {
-                    if(value.isEmpty) {
+                    if (value.isEmpty) {
                       return 'Please add a price';
                     }
-                    if (double.tryParse(value) == null) {//Double.tryParse(value) return a null if value is not double 
-                    return 'Please enter a valid number';
-                      }
+                    if (double.tryParse(value) == null) {
+                      //Double.tryParse(value) return a null if value is not double
+                      return 'Please enter a valid number';
+                    }
                     if (double.parse(value) <= 0) {
                       return 'Plese enter a number greater  than 0';
                     }
@@ -203,11 +213,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           if (value.isEmpty) {
                             return 'Please add a image URL';
                           }
-                          if (!value.startsWith('http') || !value.startsWith('https')) {
+                          if (!value.startsWith('http') ||
+                              !value.startsWith('https')) {
                             return "This filed should only contain URL's";
-
                           }
 
+                          if (!value.endsWith('.png') ||
+                              (!value.endsWith('.jpg')) ||
+                              (!value.endsWith('.jpeg'))) {
+                            return 'The URL should contain an immage address';
+                          }
+                          return null;
                         },
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
