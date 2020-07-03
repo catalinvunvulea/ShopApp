@@ -69,28 +69,31 @@ class Products with ChangeNotifier {
 
   void addProduct(Product product) {
     const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
-    http.post(
+    http
+        .post(
+      //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
       url,
       body: json.encode({
-        //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
         'title': product.title,
         'description': product.description,
         'price': product.price,
         'imageUrl': product.imageUrl,
         'isFavourite': product.isFavourie,
       }),
-    );
-
-    final newProduct = Product(
-        title: product.title,
-        price: product.price,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        id: DateTime.now().toString() //use this "unique" id
-        );
-    //_items.insert(0, newProduct); // add product at the beginning of the list
-    _items.add(newProduct); //add product at the end of the list
-    notifyListeners();
+    )
+        .then((response) {
+      //any code line after post will run, even if we don't receive a response from server; if we wait for something, we need to use .then(){and add here func to run once post is finalised}
+      final newProduct = Product(
+          title: product.title,
+          price: product.price,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          id: json.decode(response.body)['name'] //response is the data saved, body is the name of the map created(unique name, like id)
+          );
+      //_items.insert(0, newProduct); // add product at the beginning of the list
+      _items.add(newProduct); //add product at the end of the list
+      notifyListeners();
+    });
   }
 //comented as we should not set this globally
   // void showFavouritesOnly() {
