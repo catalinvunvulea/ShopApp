@@ -93,6 +93,8 @@ class Products with ChangeNotifier {
       //_items.insert(0, newProduct); // add product at the beginning of the list
       _items.add(newProduct); //add product at the end of the list
       notifyListeners();
+    }).catchError((error) {
+      throw(error); //in this case we throw the error (if we have one) as we need to catch it in the EditProductScreen
     });
   }
 //comented as we should not set this globally

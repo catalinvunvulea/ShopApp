@@ -117,7 +117,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
       // else we add a new product
       Provider.of<Products>(context, listen: false)
           .addProduct(_editedProduct)
-          .then((_) {
+          .catchError((error) { //if we have an error, this is where we catch it, once it's thrown (by us) in the provider; for a good user experience
+        return showDialog<Null>( //we return (and not add this directly) as we don't wish to execute the other .then (close the screen) untill we press ok
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occured!'), //show a title
+            content: Text(error.toString()), //show the error code, can add anything
+            actions: <Widget>[FlatButton(onPressed: () { //button to close the aller
+              Navigator.of(context).pop(); //close the dialog alert
+            }, child: Text('OK'))],
+          ),
+        );
+      }).then((_) {
         //then, as we wish to leave the page only once the product was added
         _isLoading = false; //before the screen quit
         Navigator.of(context).pop(); //leave the page
@@ -143,8 +154,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
+                    //backgroundColor: Theme.of(context).primaryColor,,
+                    ),
               )
             : Padding(
                 padding: EdgeInsets.all(16),
