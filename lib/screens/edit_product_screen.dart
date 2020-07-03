@@ -52,12 +52,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
+    final _isValid = _form.currentState
+        .validate(); //trigger all the validaters from the form
+    if (!_isValid) {
+      return;
+    }
+
     _form.currentState
         .save(); //this metod alows you to take and use the values entered in the TextFormFields (from the List) - access "onSaved" of each TextFormFields
-        print(_editedProduct.title);
-        print(_editedProduct.description);
-        print(_editedProduct.price);
-        print(_editedProduct.imageUrl);
+    print(_editedProduct.title);
+    print(_editedProduct.description);
+    print(_editedProduct.price);
+    print(_editedProduct.imageUrl);
   }
 
   @override
@@ -83,7 +89,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: ListView(
               children: <Widget>[
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Title'),
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    errorStyle: TextStyle(color: Colors.redAccent),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      //if user hasn't added a value
+                      return 'Please add a Title'; //can be formated where Text Title is added (errorStyle)
+                    }
+                    return null; // = doesn't do anything
+                  },
                   textInputAction: TextInputAction
                       .next, //what to show on the keyboard [ok btn] (next, new line)
                   onFieldSubmitted: (_) {
@@ -91,7 +107,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     FocusScope.of(context).requestFocus(
                         _priceFocusNode); //we tell the cursore to jump to a different TextFormField when action btn from keybord press (in this case it wil jump to _priceFocusNode)
                   },
-                  onSaved: (value) {//this is communicating with _form.currentState.save()
+                  onSaved: (value) {
+                    //this is communicating with _form.currentState.save()
                     _editedProduct = Product(
                         //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
                         id: null,
