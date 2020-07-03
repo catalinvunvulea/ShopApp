@@ -123,8 +123,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   validator: (value) {
                     if(value.isEmpty) {
                       return 'Please add a price';
-
-                      
                     }
                     if (double.tryParse(value) == null) {//Double.tryParse(value) return a null if value is not double 
                     return 'Please enter a valid number';
@@ -151,6 +149,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Description'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    if (value.length < 10) {
+                      return 'Please enter a description longer than 10 characters';
+                    }
+                    return null;
+                  },
                   keyboardType: TextInputType
                       .multiline, //give a enter symbol on the keyboard
                   maxLines:
@@ -192,6 +199,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       child: TextFormField(
                         //takes all the available width, and as it is in a row, we need to wrap in Expanded
                         decoration: InputDecoration(hintText: 'Image Url'),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please add a image URL';
+                          }
+                          if (!value.startsWith('http') || !value.startsWith('https')) {
+                            return "This filed should only contain URL's";
+
+                          }
+
+                        },
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
                         controller:
