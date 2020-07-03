@@ -52,7 +52,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           (!_imageUrlController.text.endsWith('.png')) ||
           (!_imageUrlController.text.endsWith('.jpg')) ||
           (!_imageUrlController.text.endsWith('.jpeg'))) {
-        return;
+        return; //we set state (reload screen) only if link contains an immage
       }
       setState(() {
         
