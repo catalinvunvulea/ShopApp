@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../provider/products_provider.dart';
 import '../screens/edit_product_screen.dart';
 
 class UserProducItem extends StatelessWidget {
@@ -37,7 +39,9 @@ class UserProducItem extends StatelessWidget {
                     Icons.delete,
                   ),
                   color: Theme.of(context).errorColor,
-                  onPressed: () {},
+                  onPressed: () {
+                    Provider.of<Products>(context, listen: false).deleteProduct(id); //or else, we could pass in a func and call the provider in the user_producScreen
+                  },
                 )
               ],
             ),
