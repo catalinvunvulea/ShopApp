@@ -39,12 +39,12 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
     Product(
-      id: 'p5',
-      title: 'Bike',
-      description: 'Great for excercice anywhere and anytime you want!',
-      price: 549.99,
-      imageUrl:'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'
-    ),
+        id: 'p5',
+        title: 'Bike',
+        description: 'Great for excercice anywhere and anytime you want!',
+        price: 549.99,
+        imageUrl:
+            'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'),
   ];
 
   var _showFavouritesOnly = false;
@@ -64,8 +64,16 @@ class Products with ChangeNotifier {
     return _items.where((element) => element.isFavourie).toList();
   }
 
-  void addProducts() {
-    // _items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+      title: product.title,
+      price: product.price,
+      description: product.description,
+      imageUrl: product.imageUrl,
+      id: DateTime.now().toIso8601String() //use this "unique" id
+    );
+     //_items.insert(0, newProduct); // add product at the beginning of the list
+     _items.add(newProduct); //add product at the end of the list
     notifyListeners();
   }
 //comented as we should not set this globally

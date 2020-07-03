@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../provider/products_provider.dart';
 import '../model/product.dart';
 
 class EditProductScreen extends StatefulWidget {
@@ -48,7 +50,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!_imageUrlFocusNode.hasFocus) {
       //if the focus (user tapped somewhere else) was moved from this textFormField, we rebuild the screen so we can see the image
       if ((!_imageUrlController.text.startsWith('http') ||
-              !_imageUrlController.text.startsWith('https')) ||
+              !_imageUrlController.text.startsWith('https')) &&
           (!_imageUrlController.text.endsWith('.png')) ||
           (!_imageUrlController.text.endsWith('.jpg')) ||
           (!_imageUrlController.text.endsWith('.jpeg'))) {
@@ -69,10 +71,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     _form.currentState
         .save(); //this metod alows you to take and use the values entered in the TextFormFields (from the List) - access "onSaved" of each TextFormFields
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop(); //leave the page
   }
 
   @override
@@ -213,13 +213,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           if (value.isEmpty) {
                             return 'Please add a image URL';
                           }
-                          if (!value.startsWith('http') ||
+                          if (!value.startsWith('http') &&
                               !value.startsWith('https')) {
                             return "This filed should only contain URL's";
                           }
-
-                          if (!value.endsWith('.png') ||
-                              (!value.endsWith('.jpg')) ||
+                          
+                          if (!value.endsWith('.png') &&
+                              (!value.endsWith('.jpg')) &&
                               (!value.endsWith('.jpeg'))) {
                             return 'The URL should contain an immage address';
                           }
