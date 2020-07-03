@@ -52,7 +52,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       //we wish to run this code only once, didChangeDep runs multiple times, hence this line of code
       final productId = ModalRoute.of(context).settings.arguments
           as String; //access the productId from previous screen, but we will have an argument only if page was loaded from editProduct and not from addProduct
-      if (productId != null) { //only if we receive a productID (from edit)
+      if (productId != null) {
+        //only if we receive a productID (from edit)
         _editedProduct = Provider.of<Products>(context, listen: false).findById(
             productId); //listener false as we wish to listen only once when we get the prouct
         _initValue = {
@@ -60,9 +61,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
           'descrition': _editedProduct.description,
           'price': _editedProduct.price.toString(),
           'imageUrl': ''
-         // 'imageUrl': _editedProduct.imageUrl //we can't add the value form here as we use controller in ImageUrl textField
+          // 'imageUrl': _editedProduct.imageUrl //we can't add the value form here as we use controller in ImageUrl textField
         };
-        _imageUrlController.text = _editedProduct.imageUrl; //we need to set the initialValue of the TextFormField for imageUrl using the controller
+        _imageUrlController.text = _editedProduct
+            .imageUrl; //we need to set the initialValue of the TextFormField for imageUrl using the controller
       }
       _isInit = false; //as we only wish to run once the code above
     }
@@ -99,10 +101,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (!_isValid) {
       return;
     }
-
     _form.currentState
         .save(); //this metod alows you to take and use the values entered in the TextFormFields (from the List) - access "onSaved" of each TextFormFields
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    if (_editedProduct.id != null) {
+      //to avoid saving the edited item as a new one, if we have id, it means we only edit and not create a new one
+      Provider.of<Products>(context, listen: false)
+          .updateProducts(_editedProduct.id, _editedProduct);
+    } else {
+      // else we add a new product
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
     Navigator.of(context).pop(); //leave the page
   }
 
@@ -129,7 +137,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: ListView(
               children: <Widget>[
                 TextFormField(
-                  initialValue: _initValue['title'], //this will be emty if we don't receive data from previous screen (we access the map _initValue, key title)
+                  initialValue: _initValue[
+                      'title'], //this will be emty if we don't receive data from previous screen (we access the map _initValue, key title)
                   decoration: InputDecoration(
                     labelText: 'Title',
                     errorStyle: TextStyle(color: Colors.redAccent),
@@ -152,7 +161,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     //this is communicating with _form.currentState.save()
                     _editedProduct = Product(
                         //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
-                        id: null,
+                        id: _editedProduct.id,
+                        isFavourie: _editedProduct.isFavourie,
                         title: value,
                         description: _editedProduct.description,
                         price: _editedProduct.price,
@@ -183,7 +193,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                   onSaved: (value) {
                     _editedProduct = Product(
-                        id: null,
+                        id: _editedProduct.id,
+                        isFavourie: _editedProduct.isFavourie,
                         title: _editedProduct.title,
                         description: _editedProduct.description,
                         price: double.parse(value),
@@ -209,7 +220,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   focusNode: _descriptionFocusNode,
                   onSaved: (value) {
                     _editedProduct = Product(
-                        id: null,
+                        id: _editedProduct.id,
+                        isFavourie: _editedProduct.isFavourie,
                         title: _editedProduct.title,
                         description: value,
                         price: _editedProduct.price,
@@ -242,7 +254,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     Expanded(
                       child: TextFormField(
                         //takes all the available width, and as it is in a row, we need to wrap in Expanded
-                       // initialValue: _initValue['imageUrl'], // we can't add initialValue from here if we have a controller in this TextFormatField, instead we set initial value form the controller
+                        // initialValue: _initValue['imageUrl'], // we can't add initialValue from here if we have a controller in this TextFormatField, instead we set initial value form the controller
                         decoration: InputDecoration(hintText: 'Image Url'),
                         validator: (value) {
                           if (value.isEmpty) {
@@ -270,7 +282,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             _saveForm(), //when done btn from keybord is pressed (for this textFieldForm only)
                         onSaved: (value) {
                           _editedProduct = Product(
-                              id: null,
+                              id: _editedProduct.id,
+                              isFavourie: _editedProduct.isFavourie,
                               title: _editedProduct.title,
                               description: _editedProduct.description,
                               price: _editedProduct.price,

@@ -90,4 +90,15 @@ class Products with ChangeNotifier {
   Product findById(String id) {
     return _items.firstWhere((element) => element.id == id);
   }
+
+  void updateProducts(String id, Product editedProduct) {
+    final prodIndex = _items.indexWhere((product) => product.id == id); //get the index where product.id = id received a parameter
+    if (prodIndex > 0) { //we check to ensure we have a index (have found a product with that id), not requiered in our app
+    _items[prodIndex] = editedProduct; //we overwrite the product from the certain index with the new one, which we edit
+    } else {
+      //...
+    }
+    notifyListeners();
+
+  }
 }
