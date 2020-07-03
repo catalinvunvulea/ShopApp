@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; //tools for converting data (ex: conver data into JSON JavaScriptObjectNotation - it's like  Map/Dicitonary)
+import 'package:http/http.dart'
+    as http; //every time when we access this class, we need to ad http. to avoid clashesh with pther func
 
 import '../model/product.dart';
 
@@ -65,15 +68,28 @@ class Products with ChangeNotifier {
   }
 
   void addProduct(Product product) {
-    final newProduct = Product(
-      title: product.title,
-      price: product.price,
-      description: product.description,
-      imageUrl: product.imageUrl,
-      id: DateTime.now().toIso8601String() //use this "unique" id
+    const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
+    http.post(
+      url,
+      body: json.encode({
+        //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
+        'title': product.title,
+        'description': product.description,
+        'price': product.price,
+        'imageUrl': product.imageUrl,
+        'isFavourite': product.isFavourie,
+      }),
     );
-     //_items.insert(0, newProduct); // add product at the beginning of the list
-     _items.add(newProduct); //add product at the end of the list
+
+    final newProduct = Product(
+        title: product.title,
+        price: product.price,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        id: DateTime.now().toString() //use this "unique" id
+        );
+    //_items.insert(0, newProduct); // add product at the beginning of the list
+    _items.add(newProduct); //add product at the end of the list
     notifyListeners();
   }
 //comented as we should not set this globally
@@ -92,14 +108,17 @@ class Products with ChangeNotifier {
   }
 
   void updateProducts(String id, Product editedProduct) {
-    final prodIndex = _items.indexWhere((product) => product.id == id); //get the index where product.id = id received a parameter
-    if (prodIndex > 0) { //we check to ensure we have a index (have found a product with that id), not requiered in our app
-    _items[prodIndex] = editedProduct; //we overwrite the product from the certain index with the new one, which we edit
+    final prodIndex = _items.indexWhere((product) =>
+        product.id ==
+        id); //get the index where product.id = id received a parameter
+    if (prodIndex > 0) {
+      //we check to ensure we have a index (have found a product with that id), not requiered in our app
+      _items[prodIndex] =
+          editedProduct; //we overwrite the product from the certain index with the new one, which we edit
     } else {
       //...
     }
     notifyListeners();
-
   }
 
   void deleteProduct(String id) {
