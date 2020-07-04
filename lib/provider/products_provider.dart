@@ -9,45 +9,45 @@ class Products with ChangeNotifier {
   //with = light enharitance; ChangeNotifier is built in the provider (added in pubspec, available https://pub.dev/packages/provider#-installing-tab-)
 
   List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-    Product(
-        id: 'p5',
-        title: 'Bike',
-        description: 'Great for excercice anywhere and anytime you want!',
-        price: 549.99,
-        imageUrl:
-            'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'),
+    // Product(
+    //   id: 'p1',
+    //   title: 'Red Shirt',
+    //   description: 'A red shirt - it is pretty red!',
+    //   price: 29.99,
+    //   imageUrl:
+    //       'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
+    // ),
+    // Product(
+    //   id: 'p2',
+    //   title: 'Trousers',
+    //   description: 'A nice pair of trousers.',
+    //   price: 59.99,
+    //   imageUrl:
+    //       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
+    // ),
+    // Product(
+    //   id: 'p3',
+    //   title: 'Yellow Scarf',
+    //   description: 'Warm and cozy - exactly what you need for the winter.',
+    //   price: 19.99,
+    //   imageUrl:
+    //       'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
+    // ),
+    // Product(
+    //   id: 'p4',
+    //   title: 'Pan',
+    //   description: 'Prepare any meal you want.',
+    //   price: 49.99,
+    //   imageUrl:
+    //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+    // ),
+    // Product(
+    //     id: 'p5',
+    //     title: 'Bike',
+    //     description: 'Great for excercice anywhere and anytime you want!',
+    //     price: 549.99,
+    //     imageUrl:
+    //         'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'),
   ];
 
   var _showFavouritesOnly = false;
@@ -67,41 +67,66 @@ class Products with ChangeNotifier {
     return _items.where((element) => element.isFavourie).toList();
   }
 
-  Future<void> fetchAndSetProducts() async { //returns  void Future, and async
-    const url = 'https://shopapp-9c0d8.firebaseio.com/products.json'; //url from where we wish to get the data
-    try { //as the following code maight give an error
-    final response = await http.get(url); //http only becaus we added "as http" in the import; get=get data from
-    print(json.decode(response.body));
-    } catch (error ){
-      throw(error); //in case we get one, throw so we can use it in the screen
+  Future<void> fetchAndSetProducts() async {
+    //returns  void Future, and async
+    const url =
+        'https://shopapp-9c0d8.firebaseio.com/products.json'; //url from where we wish to get the data
+    try {
+      //as the following code maight give an error
+      final response = await http.get(
+          url); //http only becaus we added "as http" in the import; get=get data from
+      final extractedData = json.decode(response.body) as Map<String,
+          dynamic>; //we receive from the server a Map of String(key) and a dynamic value (we know it's a map but is not always the case)
+      final List<Product> loadedProducts = []; //create a emty list of Product
+      extractedData.forEach((key, value) {
+        //extractData = Map hence .forEach (key, value)
+        loadedProducts.add(
+          //we populate our product with the data from server
+          Product(
+            id: key,
+            title: value['title'],
+            description: value['description'],
+            price: value['price'],
+            isFavourie: value['isFavourite'],
+            imageUrl: value['imageUrl'],
+          ),
+        );
+      });
+      _items = loadedProducts; //items will now contain the data received from server
+      notifyListeners();
+    } catch (error) {
+      throw (error); //in case we get one, throw so we can use it in the screen
     }
-    
   }
 
-  Future<void> addProduct(Product product) async{//instead of future we can use async, it will always return a future(this is <void>)
+  Future<void> addProduct(Product product) async {
+    //instead of future we can use async, it will always return a future(this is <void>)
     //(if future used)to add a spinner once we add a new product, untill the data is available, we will return a Future
-       const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
-    try { //part of async, wrap the code that might fail to catch the error
-  
-    final response = await http //await is part of async; we are storing the response in a constant
-        .post(
-      //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'price': product.price,
-        'imageUrl': product.imageUrl,
-        'isFavourite': product.isFavourie,
-      }),
-    );
-    //this will run only if the above code succeed
-    final newProduct = Product(
+    const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
+    try {
+      //part of async, wrap the code that might fail to catch the error
+
+      final response =
+          await http //await is part of async; we are storing the response in a constant
+              .post(
+        //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+          'isFavourite': product.isFavourie,
+        }),
+      );
+      //this will run only if the above code succeed
+      final newProduct = Product(
           title: product.title,
           price: product.price,
           description: product.description,
           imageUrl: product.imageUrl,
-          id: json.decode(response.body)['name'] //response is the data saved, body is the name of the map created(unique name, like id)
+          id: json.decode(response.body)[
+              'name'] //response is the data saved, body is the name of the map created(unique name, like id)
           );
       //_items.insert(0, newProduct); // add product at the beginning of the list
       _items.add(newProduct); //add product at the end of the list
@@ -110,12 +135,12 @@ class Products with ChangeNotifier {
       //the code that will run when what is agter try throws an error
       throw (error); //we throw the error like we did when used catchError, to use it in the UserScreen
     }
-       // .then((response) { - used with future //response = code after post; once response code is received (after the rest of code from app runs), the code after then runs
-      //any code line after post will run, even if we don't receive a response from server; if we wait for something, we need to use .then(){and add here func to run once post is finalised}
-      
-   // }).catchError((error) {//used only with Future
-   //   throw(error); //in this case we throw the error (if we have one) as we need to catch it in the EditProductScreen
-   // });
+    // .then((response) { - used with future //response = code after post; once response code is received (after the rest of code from app runs), the code after then runs
+    //any code line after post will run, even if we don't receive a response from server; if we wait for something, we need to use .then(){and add here func to run once post is finalised}
+
+    // }).catchError((error) {//used only with Future
+    //   throw(error); //in this case we throw the error (if we have one) as we need to catch it in the EditProductScreen
+    // });
   }
 //comented as we should not set this globally
   // void showFavouritesOnly() {
