@@ -67,7 +67,18 @@ class Products with ChangeNotifier {
     return _items.where((element) => element.isFavourie).toList();
   }
 
-  Future<void> addProduct(Product product) async{//instead of future we can use async, it will always return a future
+  Future<void> fetchAndSetProducts() async { //returns  void Future, and async
+    const url = 'https://shopapp-9c0d8.firebaseio.com/products.json'; //url from where we wish to get the data
+    try { //as the following code maight give an error
+    final response = await http.get(url); //http only becaus we added "as http" in the import; get=get data from
+    print(json.decode(response.body));
+    } catch (error ){
+      throw(error); //in case we get one, throw so we can use it in the screen
+    }
+    
+  }
+
+  Future<void> addProduct(Product product) async{//instead of future we can use async, it will always return a future(this is <void>)
     //(if future used)to add a spinner once we add a new product, untill the data is available, we will return a Future
        const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
     try { //part of async, wrap the code that might fail to catch the error
