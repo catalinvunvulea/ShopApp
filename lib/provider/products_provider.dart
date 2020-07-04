@@ -50,7 +50,7 @@ class Products with ChangeNotifier {
     //         'https://www.candncycles.co.uk/product_images/uploaded_images/hire-bike-surrey.jpg'),
   ];
 
-  var _showFavouritesOnly = false;
+  //var _showFavouritesOnly = false;
 
   List<Product> get items {
     // if (_showFavouritesOnly) {
@@ -92,7 +92,8 @@ class Products with ChangeNotifier {
           ),
         );
       });
-      _items = loadedProducts; //items will now contain the data received from server
+      _items =
+          loadedProducts; //items will now contain the data received from server
       notifyListeners();
     } catch (error) {
       throw (error); //in case we get one, throw so we can use it in the screen
@@ -157,18 +158,29 @@ class Products with ChangeNotifier {
     return _items.firstWhere((element) => element.id == id);
   }
 
-  void updateProducts(String id, Product editedProduct) {
+  Future<void> updateProducts(String id, Product editedProduct) async {
     final prodIndex = _items.indexWhere((product) =>
         product.id ==
         id); //get the index where product.id = id received a parameter
     if (prodIndex > 0) {
       //we check to ensure we have a index (have found a product with that id), not requiered in our app
+      final url =
+          'https://shopapp-9c0d8.firebaseio.com/products/$id.json'; // adding / after product will dive further in the data base; we interpolate the id form the argument (hence url is no longer const but final)
+      await http.patch(
+          url, //patch = modify existing data on firebase; url = location, body = content
+          body: json.encode({
+            'title': editedProduct.title,
+            'price': editedProduct.price,
+            'description': editedProduct.description,
+            'imageUrl': editedProduct.imageUrl,
+            //'isFavourite': editedProduct.isFavourie,//if we don't add one of the lines in PATCH, it will stay the same, it won't get deleted
+          }));
       _items[prodIndex] =
           editedProduct; //we overwrite the product from the certain index with the new one, which we edit
+      notifyListeners();
     } else {
       //...
     }
-    notifyListeners();
   }
 
   void deleteProduct(String id) {

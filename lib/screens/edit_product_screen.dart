@@ -110,13 +110,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
     if (_editedProduct.id != null) {
       //to avoid saving the edited item as a new one, if we have id, it means we only edit and not create a new one
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false) //await untill edited data is updated so it can be shown once screen is dismissed
           .updateProducts(_editedProduct.id, _editedProduct);
 
-      setState(() {
-        _isLoading = false; //before the screen quit
-      });
-      Navigator.of(context).pop(); //leave the page
     } else {
       // else we add a new product
       //up to here code runs in time
@@ -144,14 +140,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      } finally {
-        //used with try catch; always run no mather if there is an error
-        setState(() {
-          _isLoading = false; //before the screen quit
-        });
-        Navigator.of(context).pop(); //leave the page
-      }
+      } 
+      // finally { //no longer requiered as we run the same code outside the if statement, and it wil run only after await is runned
+      //   //used with try catch; always run no mather if there is an error
+      //   setState(() {
+      //     _isLoading = false; //before the screen quit
+      //   });
+      //   Navigator.of(context).pop(); //leave the page
+      // }
     }
+    setState(() {
+        _isLoading = false; //before the screen quit
+      });
+      Navigator.of(context).pop(); //leave the page
     //used if Future.then is used, and not async .catchError((error) { //if we have an error, this is where we catch it, once it's thrown (by us) in the provider; for a good user experience
     //.then((_) {
     //then, as we wish to leave the page only once the product was added
