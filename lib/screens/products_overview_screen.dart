@@ -22,21 +22,30 @@ class ProductsOverviewScreen extends StatefulWidget {
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showOnlyFavourite = false;
   var _isInit = true; //to avoid multiple run for code in  didChangeDependencies
+  var _isLoading = false;
 
   @override
-  void initState() { //initialState = before the pixels on the screen are built
+  void initState() {
+    //initialState = before the pixels on the screen are built
     super.initState();
     // Provider.of<Products>(context).fetchAndSetProducts(); //this won't work here
     // Future.delayed(Duration.zero).then((_) => Provider.of<Products>(context).fetchAndSetProducts()); //this woud work but is better to use  didChangeDependencies
   }
 
   @override
-  void didChangeDependencies() { //called whenever a state is changing, but also at the beginning (with initState)
+  void didChangeDependencies() {
+    //called whenever a state is changing, but also at the beginning (with initState)
     super.didChangeDependencies();
     if (_isInit) {
-      Provider.of<Products>(context)
-          .fetchAndSetProducts(); //this won't work in the initState
-    } 
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        }); //this won't work in the initState; once we have received the data, we switch the loading to false
+      });
+    }
     setState(() {
       _isInit = false;
     });
@@ -89,7 +98,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavourite),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavourite),
     );
     return scaffold;
   }
