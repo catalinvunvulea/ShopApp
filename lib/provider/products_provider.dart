@@ -183,7 +183,9 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
+    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json';
+    await http.delete(url);
     _items.removeWhere((element) => element.id == id);
     notifyListeners();
   }
