@@ -67,9 +67,12 @@ class Products with ChangeNotifier {
     return _items.where((element) => element.isFavourie).toList();
   }
 
-  Future<void> addProduct(Product product) {//to add a spinner once we add a new product, untill the data is available, we will return a Future
-     const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
-    return http
+  Future<void> addProduct(Product product) async{//instead of future we can use async, it will always return a future
+    //(if future used)to add a spinner once we add a new product, untill the data is available, we will return a Future
+       const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
+    try { //part of async, wrap the code that might fail to catch the error
+  
+    final response = await http //await is part of async; we are storing the response in a constant
         .post(
       //http(because we use as in the import), post = add something on database(firbase), url = location, body: json.encode ({ here we add a Map (can't add directly and object like Product )})
       url,
@@ -80,10 +83,9 @@ class Products with ChangeNotifier {
         'imageUrl': product.imageUrl,
         'isFavourite': product.isFavourie,
       }),
-    )
-        .then((response) { //response = code after post; once response code is received (after the rest of code from app runs), the code after then runs
-      //any code line after post will run, even if we don't receive a response from server; if we wait for something, we need to use .then(){and add here func to run once post is finalised}
-      final newProduct = Product(
+    );
+    //this will run only if the above code succeed
+    final newProduct = Product(
           title: product.title,
           price: product.price,
           description: product.description,
@@ -93,9 +95,16 @@ class Products with ChangeNotifier {
       //_items.insert(0, newProduct); // add product at the beginning of the list
       _items.add(newProduct); //add product at the end of the list
       notifyListeners();
-    }).catchError((error) {
-      throw(error); //in this case we throw the error (if we have one) as we need to catch it in the EditProductScreen
-    });
+    } catch (error) {
+      //the code that will run when what is agter try throws an error
+      throw (error); //we throw the error like we did when used catchError, to use it in the UserScreen
+    }
+       // .then((response) { - used with future //response = code after post; once response code is received (after the rest of code from app runs), the code after then runs
+      //any code line after post will run, even if we don't receive a response from server; if we wait for something, we need to use .then(){and add here func to run once post is finalised}
+      
+   // }).catchError((error) {//used only with Future
+   //   throw(error); //in this case we throw the error (if we have one) as we need to catch it in the EditProductScreen
+   // });
   }
 //comented as we should not set this globally
   // void showFavouritesOnly() {
