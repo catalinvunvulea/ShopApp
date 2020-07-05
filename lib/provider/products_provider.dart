@@ -3,6 +3,7 @@ import 'dart:convert'; //tools for converting data (ex: conver data into JSON Ja
 import 'package:http/http.dart'
     as http; //every time when we access this class, we need to ad http. to avoid clashesh with pther func
 
+import '../model/http_exception.dart';
 import '../model/product.dart';
 
 class Products with ChangeNotifier {
@@ -184,22 +185,23 @@ class Products with ChangeNotifier {
   }
 
 //this si called: OPTIMISTIC UPDATING  (deleting in our case) = re-update the product in we fail to delete from server
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id';
     final existingProductIndex =
         _items.indexWhere((element) => element.id == id);
     var existingProduct = _items[
         existingProductIndex]; //before we delete, we store the item in this var
     _items.removeAt(existingProductIndex); //remove from the list
-    http.delete(url).then((_) {//unlike add and post, delete does not throw an error; hence we check if there is an error, what error, and then we take action accordingly
-      existingProduct =
-          null; //if we succeed to delete the item from the server, we clear the product from the memory of the phone (this var) as well
+    final response = await http.delete(
+        url); //unlike add and post, delete does not throw an error; hence we check if there is an error, what error, and then we take action accordingly
+    if (response.statusCode >= 400) {
+      //for delete, we need to check what error it was, and we need to build and throw our own exception
+      _items.insert(existingProductIndex, existingProduct); //if we have an error, we restore the _items list using the info stored in the memory (var existingProduct )
       notifyListeners();
-    }).catchError((_) {
-      //try to delete from server; if it fails, catchError will notify us and we will restore the item in the list (this is why we previously saved in in the memory on that var)
-      _items.insert(existingProductIndex, existingProduct);
-    notifyListeners();
-    });
+      throw HttpException('Could not delete product');
+    } //try to delete from server; if it fails, we will have this thrown,  
+    existingProduct =
+        null; //if we succeed to delete the item from the server, we clear the product from the memory of the phone (this var) as well
   }
 
 //the below option would wor as well

@@ -13,6 +13,7 @@ class UserProducItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldContext = Scaffold.of(context); //store it here as we will use it in a future and this is the only way we can
     return Column(
       children: <Widget>[
         ListTile(
@@ -39,8 +40,18 @@ class UserProducItem extends StatelessWidget {
                     Icons.delete,
                   ),
                   color: Theme.of(context).errorColor,
-                  onPressed: () {
-                    Provider.of<Products>(context, listen: false).deleteProduct(id); //or else, we could pass in a func and call the provider in the user_producScreen
+                  onPressed: () async {
+                    try {
+                      await Provider.of<Products>(context, listen: false).deleteProduct(
+                          id); //or else, we could pass in a func and call the provider in the user_producScreen
+
+                    } catch (error) {
+                      scaffoldContext.showSnackBar(SnackBar(
+                        content: Text(
+                          'Deleting faield!',
+                        ),
+                      ));
+                    }
                   },
                 )
               ],

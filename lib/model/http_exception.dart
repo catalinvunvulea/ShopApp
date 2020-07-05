@@ -5,7 +5,7 @@
 
 class HttpException implements Exception{ //implement = our class is forced to implement all function the implemented (our case Exceptions) has; Exceptions is an abstract class = can't be instantiated
 
-final String message; //exception tipically store a message
+final String message; //exception tipically store a message; we can add any message we want, depending on the error code
 
 HttpException(this.message);
 
