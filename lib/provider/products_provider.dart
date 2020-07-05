@@ -79,6 +79,9 @@ class Products with ChangeNotifier {
       final extractedData = json.decode(response.body) as Map<String,
           dynamic>; //we receive from the server a Map of String(key) and a dynamic value (we know it's a map but is not always the case)
       final List<Product> loadedProducts = []; //create a emty list of Product
+      if (extractedData == null) {
+        return; //stop code if we don't ave products on the server
+      }
       extractedData.forEach((key, value) {
         //extractData = Map hence .forEach (key, value)
         loadedProducts.add(

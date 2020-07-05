@@ -53,6 +53,9 @@ class Orders with ChangeNotifier {
     final List<OrderItemM> loadedOrders = [];
     final extractedData = json.decode(response.body) as Map<String,
         dynamic>; //data received form server, decoded using json, we tell it that is a Map with a string as the key, and the value is dynamic (can be anything, we have a list of Maps, and one of the keys(producs) nest as well a list of maps )
+    if (extractedData == null) {
+      return; //we will stop the code if the extractedData == null (no orders on server) else we get an error
+    }
     extractedData.forEach((orderId, orderData) {
       //orderId = key, orderData = value
       loadedOrders.add(OrderItemM(
@@ -71,7 +74,7 @@ class Orders with ChangeNotifier {
             .toList(),
       ));
     });
-    _orders = loadedOrders;
+    _orders = loadedOrders.reversed.toList(); // reversed.toList(); to show the latest on top
     notifyListeners();
   }
 }
