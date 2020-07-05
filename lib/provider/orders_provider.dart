@@ -46,4 +46,32 @@ class Orders with ChangeNotifier {
     );
     notifyListeners();
   }
+
+  Future<void> setAndFetchOrders() async {
+    const url = 'https://shopapp-9c0d8.firebaseio.com/orders.json';
+    final response = await http.get(url);
+    final List<OrderItemM> loadedOrders = [];
+    final extractedData = json.decode(response.body) as Map<String,
+        dynamic>; //data received form server, decoded using json, we tell it that is a Map with a string as the key, and the value is dynamic (can be anything, we have a list of Maps, and one of the keys(producs) nest as well a list of maps )
+    extractedData.forEach((orderId, orderData) {
+      //orderId = key, orderData = value
+      loadedOrders.add(OrderItemM(
+        id: orderId,
+        amount: orderData['amount'],
+        dateTime: DateTime.parse(orderData['dateTime']),
+        products: (orderData['products'] as List<dynamic>)
+            .map(
+              (item) => CartItemM(
+                cartId: item['id'],
+                title: item['title'],
+                quantity: item['quantity'],
+                price: item['price'],
+              ),
+            )
+            .toList(),
+      ));
+    });
+    _orders = loadedOrders;
+    notifyListeners();
+  }
 }
