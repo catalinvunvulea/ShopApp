@@ -183,10 +183,30 @@ class Products with ChangeNotifier {
     }
   }
 
-  Future<void> deleteProduct(String id) async {
-    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json';
-    await http.delete(url);
-    _items.removeWhere((element) => element.id == id);
+//this si called: OPTIMISTIC UPDATING  (deleting in our case) = re-update the product in we fail to delete from server
+  void deleteProduct(String id) {
+    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id';
+    final existingProductIndex =
+        _items.indexWhere((element) => element.id == id);
+    var existingProduct = _items[
+        existingProductIndex]; //before we delete, we store the item in this var
+    _items.removeAt(existingProductIndex); //remove from the list
+    http.delete(url).then((_) {//unlike add and post, delete does not throw an error; hence we check if there is an error, what error, and then we take action accordingly
+      existingProduct =
+          null; //if we succeed to delete the item from the server, we clear the product from the memory of the phone (this var) as well
+      notifyListeners();
+    }).catchError((_) {
+      //try to delete from server; if it fails, catchError will notify us and we will restore the item in the list (this is why we previously saved in in the memory on that var)
+      _items.insert(existingProductIndex, existingProduct);
     notifyListeners();
+    });
   }
+
+//the below option would wor as well
+  // void deleteProduct(String id) {
+  //   final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json';
+  //   _items.removeWhere((element) => element.id == id);
+  //   http.delete(url);
+  //   notifyListeners();
+  // }
 }
