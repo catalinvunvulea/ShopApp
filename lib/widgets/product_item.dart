@@ -46,7 +46,7 @@ class ProductItem extends StatelessWidget {
               //Consumer, like a provider, always listen to changes and will rebuild only what he returns => widget (shrink the area), unlike the Provider; add any widget to Consumer child and it won't change
               builder: (ctx, product, child) => IconButton(
                 icon: Icon(
-                  product.isFavourie ? Icons.favorite : Icons.favorite_border,
+                  product.isFavourite ? Icons.favorite : Icons.favorite_border,
                 ),
                 onPressed: () {
                   product.toggleFavouriteStatus();

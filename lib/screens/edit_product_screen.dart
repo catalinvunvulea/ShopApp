@@ -212,7 +212,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         _editedProduct = Product(
                             //we use the value (user text input) and save it in the product; all the other properties are unchanged, hence we need to add them as they are; we overwrite all of them them, as this is how the model was created; other option, to create a new model in this class
                             id: _editedProduct.id,
-                            isFavourie: _editedProduct.isFavourie,
+                            isFavourite: _editedProduct.isFavourite,
                             title: value,
                             description: _editedProduct.description,
                             price: _editedProduct.price,
@@ -245,7 +245,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       onSaved: (value) {
                         _editedProduct = Product(
                             id: _editedProduct.id,
-                            isFavourie: _editedProduct.isFavourie,
+                            isFavourite: _editedProduct.isFavourite,
                             title: _editedProduct.title,
                             description: _editedProduct.description,
                             price: double.parse(value),
@@ -272,7 +272,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       onSaved: (value) {
                         _editedProduct = Product(
                             id: _editedProduct.id,
-                            isFavourie: _editedProduct.isFavourie,
+                            isFavourite: _editedProduct.isFavourite,
                             title: _editedProduct.title,
                             description: value,
                             price: _editedProduct.price,
@@ -334,7 +334,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             onSaved: (value) {
                               _editedProduct = Product(
                                   id: _editedProduct.id,
-                                  isFavourie: _editedProduct.isFavourie,
+                                  isFavourite: _editedProduct.isFavourite,
                                   title: _editedProduct.title,
                                   description: _editedProduct.description,
                                   price: _editedProduct.price,

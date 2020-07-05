@@ -65,7 +65,7 @@ class Products with ChangeNotifier {
   }
 
   List<Product> get favouriteItems {
-    return _items.where((element) => element.isFavourie).toList();
+    return _items.where((element) => element.isFavourite).toList();
   }
 
   Future<void> fetchAndSetProducts() async {
@@ -88,7 +88,7 @@ class Products with ChangeNotifier {
             title: value['title'],
             description: value['description'],
             price: value['price'],
-            isFavourie: value['isFavourite'],
+            isFavourite: value['isFavourite'],
             imageUrl: value['imageUrl'],
           ),
         );
@@ -118,7 +118,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
-          'isFavourite': product.isFavourie,
+          'isFavourite': product.isFavourite,
         }),
       );
       //this will run only if the above code succeed
@@ -186,7 +186,7 @@ class Products with ChangeNotifier {
 
 //this si called: OPTIMISTIC UPDATING  (deleting in our case) = re-update the product in we fail to delete from server
   Future<void> deleteProduct(String id) async {
-    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id';
+    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json';
     final existingProductIndex =
         _items.indexWhere((element) => element.id == id);
     var existingProduct = _items[
@@ -202,6 +202,7 @@ class Products with ChangeNotifier {
     } //try to delete from server; if it fails, we will have this thrown,  
     existingProduct =
         null; //if we succeed to delete the item from the server, we clear the product from the memory of the phone (this var) as well
+    notifyListeners();
   }
 
 //the below option would wor as well
