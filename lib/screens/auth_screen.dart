@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+
+import '../provider/auth.dart';
 
 import 'dart:math';
 
@@ -59,7 +63,7 @@ class AuthScreen extends StatelessWidget {
                       child: Text(
                         'My Shop',
                         style: TextStyle(
-                          color: Theme.of(context).accentTextTheme.title.color,
+                          color: Theme.of(context).accentTextTheme.headline6.color,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -100,7 +104,7 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  void _submit() {
+ Future <void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -112,7 +116,8 @@ class _AuthCardState extends State<AuthCard> {
     if (_authMode == AuthMode.Login) {
       // Log user in
     } else {
-      // Sign user up
+      // Sign user up 
+      await Provider.of<Auth>(context, listen: false).signUp(_authData['email'], _authData['password']);
     }
     setState(() {
       _isLoading = false;
@@ -136,9 +141,9 @@ class _AuthCardState extends State<AuthCard> {
     final deviceSize = MediaQuery.of(context).size;
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(15.0),
       ),
-      elevation: 8.0,
+      elevation: 20.0,
       child: Container(
         height: _authMode == AuthMode.Signup ? 320 : 260,
         constraints:
