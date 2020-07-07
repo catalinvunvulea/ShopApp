@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/auth.dart';
+import '../model/http_exception.dart';
 
 import 'dart:math';
 
@@ -107,6 +108,22 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  void _showMessageDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An error occured'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Ok'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
@@ -116,18 +133,42 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      await Provider.of<Auth>(context, listen: false).login(
-        _authData['email'],
-        _authData['password'],
-      );
-    } else {
-      // Sign user up
-      await Provider.of<Auth>(context, listen: false).signUp(
-        _authData['email'],
-        _authData['password'],
-      );
+    try {
+      if (_authMode == AuthMode.Login) {
+        await Provider.of<Auth>(context, listen: false).login(
+          _authData['email'],
+          _authData['password'],
+        );
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false).signUp(
+          _authData['email'],
+          _authData['password'],
+        );
+      }
+    } on HttpException catch (error) {
+      //"on" helps us filter what kind of error to catch
+      var errorMessage = 'Authentication failed';
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        //thanks to our custom http_exception and HttpException, error.toString() is the actual message received from firebase
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains("INVALID_EMAIL")) {
+        errorMessage = 'This email address is invalid';
+      } else if (error.toString().contains("WEAK_PASSWORD")) {
+        errorMessage = 'This password is too weak';
+      } else if (error.toString().contains("USER_NOT_FOUND")) {
+        errorMessage = 'Could not find a user with that email';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password.';
+      }
+      _showMessageDialog(errorMessage);
+    } catch (error) {
+      //withouth "on" in front, we catch any type of exceptions
+      const errorMessage =
+          'Unable to access the server. Please check your internet connection';
+      _showMessageDialog(errorMessage);
     }
+
     setState(() {
       _isLoading = false;
     });

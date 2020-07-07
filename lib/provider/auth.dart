@@ -3,6 +3,7 @@ import 'dart:convert'; //enable us to use json.encode
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import '../model/http_exception.dart';
 
 class Auth with ChangeNotifier {
   String
@@ -11,56 +12,66 @@ class Auth with ChangeNotifier {
   String _userId;
 
   Future<void> signUp(String email, String password) async {
-     //if i would se refactore:  return _authenticate(email, password, 'signUp');
-    const url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE"; //url from https://firebase.google.com/docs/reference/rest/auth - signUp email password; link was originally "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key==[API_KEY]" but instead of [api key] we took web API Key from firebase, auth, setting
-    final response = await http.post(
-      url, //ulr is where we post (add) the data,
-      body: json.encode(
-        // body is what we send, a map of, key names are as per on the erver
-        {
-          'email': email,
-          'password': password,
-          'returnSecureToken': _token,
-        },
-      ),
-    );
-    print(json.decode(response.body));
+    return _authenticate(email, password, 'signUp');
+    // const url =
+    //     "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE"; //url from https://firebase.google.com/docs/reference/rest/auth - signUp email password; link was originally "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key==[API_KEY]" but instead of [api key] we took web API Key from firebase, auth, setting
+    // final response = await http.post(
+    //   url, //ulr is where we post (add) the data,
+    //   body: json.encode(
+    //     // body is what we send, a map of, key names are as per on the erver
+    //     {
+    //       'email': email,
+    //       'password': password,
+    //       'returnSecureToken': _token,
+    //     },
+    //   ),
+    // );
   }
 
   Future<void> login(String email, String password) async {
-    //if i would se refactore: return _authenticate(email, password, 'signInWithPassword');
-    const url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE';
-    final response = await http.post(
-      url, //ulr is where we post (add) the data,
-      body: json.encode(
-        // body is what we send, a map of, key names are as per on the erver
-        {
-          'email': email,
-          'password': password,
-          'returnSecureToken': _token,
-        },
-      ),
-    );
-    print(json.decode(response.body));
+    return _authenticate(email, password, 'signInWithPassword');
+    //if i wouldn't refactor:
+    // const url =
+    //     'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE';
+    // final response = await http.post(
+    //   url, //ulr is where we post (add) the data,
+    //   body: json.encode(
+    //     // body is what we send, a map of, key names are as per on the erver
+    //     {
+    //       'email': email,
+    //       'password': password,
+    //       'returnSecureToken': _token,
+    //     },
+    //   ),
+    // );
   }
-//below is a good method to refactor signUp and login:
 
-  Future<void> _authenticate( //could be used to refactor signUp and login
-      String email, String password, String urlSegmentDifference) async {
+  Future<void> _authenticate(
+      //used to refactor signUp and login
+      String email,
+      String password,
+      String urlSegmentDifference) async {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegmentDifference?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE';
-    final response = await http.post(
-      url, //ulr is where we post (add) the data,
-      body: json.encode(
-        // body is what we send, a map of, key names are as per on the erver
-        {
-          'email': email,
-          'password': password,
-          'returnSecureToken': _token,
-        },
-      ),
-    );
+    try {
+      final response = await http.post(
+        url, //ulr is where we post (add) the data,
+        body: json.encode(
+          // body is what we send, a map of, key names are as per on the erver
+          {
+            'email': email,
+            'password': password,
+            'returnSecureToken': _token,
+          },
+        ),
+      );
+      print(response.body);
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) { //check if we receive an error form firebase - only invalidation error (error of invalid user, or incorrect password)
+        throw HttpException(responseData['error']['message']); //we throw the message that is received from firebase
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 }
