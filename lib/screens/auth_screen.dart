@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 import '../provider/auth.dart';
 
 import 'dart:math';
@@ -46,9 +45,12 @@ class AuthScreen extends StatelessWidget {
                       margin: EdgeInsets.only(bottom: 20.0),
                       padding:
                           EdgeInsets.symmetric(vertical: 8.0, horizontal: 94.0),
-                      transform: Matrix4.rotationZ(-8 * pi / 180) //transform alows you to transform how the container is presented (rotate, scale it, move it - even off set it outside the screen); need ot use Matrix; rotationZ = rotation along the Z axis  = almost like 3d, you can see slightly an engle (in paranteze unghiul, putea fi -120 de ex)
-                        ..translate(-10.0), //..translate adds some offset in configuration with the object (with the Matrix4 in our case); we use .. so translate won't return what he return (void) but what the previous object return; alternative would be to create a final  transformConf = Matrix4.rotationZ(angle calc) and then transofrmConf.translate
-                      
+                      transform: Matrix4.rotationZ(-8 *
+                          pi /
+                          180) //transform alows you to transform how the container is presented (rotate, scale it, move it - even off set it outside the screen); need ot use Matrix; rotationZ = rotation along the Z axis  = almost like 3d, you can see slightly an engle (in paranteze unghiul, putea fi -120 de ex)
+                        ..translate(
+                            -10.0), //..translate adds some offset in configuration with the object (with the Matrix4 in our case); we use .. so translate won't return what he return (void) but what the previous object return; alternative would be to create a final  transformConf = Matrix4.rotationZ(angle calc) and then transofrmConf.translate
+
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.deepOrange.shade900,
@@ -63,7 +65,8 @@ class AuthScreen extends StatelessWidget {
                       child: Text(
                         'My Shop',
                         style: TextStyle(
-                          color: Theme.of(context).accentTextTheme.headline6.color,
+                          color:
+                              Theme.of(context).accentTextTheme.headline6.color,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -104,7 +107,7 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
- Future <void> _submit() async {
+  Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -114,10 +117,16 @@ class _AuthCardState extends State<AuthCard> {
       _isLoading = true;
     });
     if (_authMode == AuthMode.Login) {
-      // Log user in
+      await Provider.of<Auth>(context, listen: false).login(
+        _authData['email'],
+        _authData['password'],
+      );
     } else {
-      // Sign user up 
-      await Provider.of<Auth>(context, listen: false).signUp(_authData['email'], _authData['password']);
+      // Sign user up
+      await Provider.of<Auth>(context, listen: false).signUp(
+        _authData['email'],
+        _authData['password'],
+      );
     }
     setState(() {
       _isLoading = false;

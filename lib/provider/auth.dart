@@ -11,6 +11,7 @@ class Auth with ChangeNotifier {
   String _userId;
 
   Future<void> signUp(String email, String password) async {
+     //if i would se refactore:  return _authenticate(email, password, 'signUp');
     const url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE"; //url from https://firebase.google.com/docs/reference/rest/auth - signUp email password; link was originally "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key==[API_KEY]" but instead of [api key] we took web API Key from firebase, auth, setting
     final response = await http.post(
@@ -25,5 +26,41 @@ class Auth with ChangeNotifier {
       ),
     );
     print(json.decode(response.body));
+  }
+
+  Future<void> login(String email, String password) async {
+    //if i would se refactore: return _authenticate(email, password, 'signInWithPassword');
+    const url =
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE';
+    final response = await http.post(
+      url, //ulr is where we post (add) the data,
+      body: json.encode(
+        // body is what we send, a map of, key names are as per on the erver
+        {
+          'email': email,
+          'password': password,
+          'returnSecureToken': _token,
+        },
+      ),
+    );
+    print(json.decode(response.body));
+  }
+//below is a good method to refactor signUp and login:
+
+  Future<void> _authenticate( //could be used to refactor signUp and login
+      String email, String password, String urlSegmentDifference) async {
+    final url =
+        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegmentDifference?key=AIzaSyDAqLnPg9f-3aE39w94WIPaX5Wc3gIDIyE';
+    final response = await http.post(
+      url, //ulr is where we post (add) the data,
+      body: json.encode(
+        // body is what we send, a map of, key names are as per on the erver
+        {
+          'email': email,
+          'password': password,
+          'returnSecureToken': _token,
+        },
+      ),
+    );
   }
 }
