@@ -75,13 +75,13 @@ class Auth with ChangeNotifier {
           {
             'email': email,
             'password': password,
-            'returnSecureToken': _token,
+            'returnSecureToken': true,
           },
         ),
       );
       //print(response.body);
       final responseData = json.decode(response.body);
-      print(responseData['error']);
+      //print(responseData['error']);
       if (responseData['error'] != null) {
         //check if we receive an error form firebase - only invalidation error (error of invalid user, or incorrect password)
         throw HttpException(responseData['error']
@@ -89,9 +89,12 @@ class Auth with ChangeNotifier {
       }
       _token = responseData['idToken']; //idToken - name form firebase
       _userId = responseData['localId'];
-      _expiryDate = DateTime.now().add(Duration(
-        seconds: int.parse(responseData['expiresIn']),//from firebase, we receive a string of number of seconds untill the token expires; here we use now time to add the no of seconds (convert them to int) and calculate the exact date, time, hour, min, sec when the token will expire
-      ));
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData[
+              'expiresIn']), //from firebase, we receive a string of number of seconds untill the token expires; here we use now time to add the no of seconds (convert them to int) and calculate the exact date, time, hour, min, sec when the token will expire
+        ),
+      );
       notifyListeners(); //we wish to trigger the Consumer from Main, to rebuilt, and chose which screen to show
     } catch (error) {
       throw error;
