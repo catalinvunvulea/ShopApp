@@ -52,6 +52,9 @@ class Products with ChangeNotifier {
   ];
 
   //var _showFavouritesOnly = false;
+  final String authToken;
+
+  Products(this.authToken, this._items);
 
   List<Product> get items {
     // if (_showFavouritesOnly) {
