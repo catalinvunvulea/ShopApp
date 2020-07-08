@@ -21,39 +21,41 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      //enable us to have multiple ChangeNotifierProvider (listeners for different providers anywhere in the app (anywhere as we have tis in Main))
-      providers: [
-        ChangeNotifierProvider(
-          create: (ctx) => Auth(),
-        ),
-        ChangeNotifierProvider(
-          create: (ctx) =>
-              Products(), //now we have an instance of Products class which applyes to all it's child and his children (MaterialApp is the child - the route of the app, but extends to it's children, who can now also have listeners)
-        ),
-        ChangeNotifierProvider(
-          create: (ctx) => Cart(),
-        ),
-        ChangeNotifierProvider(
-          create: (ctx) => Orders(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: AuthScreen(),
-        routes: {
-          ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-          CartScreen.routeName: (ctx) => CartScreen(),
-          OrdersScreen.routeName: (ctx) => OrdersScreen(),
-          UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-          EditProductScreen.rotueName: (ctx) => EditProductScreen(),
-        },
-      ),
-    );
+        //enable us to have multiple ChangeNotifierProvider (listeners for different providers anywhere in the app (anywhere as we have tis in Main))
+        providers: [
+          ChangeNotifierProvider(
+            create: (ctx) => Auth(),
+          ),
+          ChangeNotifierProvider(
+            create: (ctx) =>
+                Products(), //now we have an instance of Products class which applyes to all it's child and his children (MaterialApp is the child - the route of the app, but extends to it's children, who can now also have listeners)
+          ),
+          ChangeNotifierProvider(
+            create: (ctx) => Cart(),
+          ),
+          ChangeNotifierProvider(
+            create: (ctx) => Orders(),
+          ),
+        ],
+        child: Consumer<Auth>(
+          builder: (ctx, auth, child) => MaterialApp(
+            //we would us child for a widget that we don't want to rebuild
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.purple,
+              accentColor: Colors.deepOrange,
+              fontFamily: 'Lato',
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(), // if we are authenticated, we shot the ProductOS otherwie the AuthScreen
+            routes: {
+              ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+              CartScreen.routeName: (ctx) => CartScreen(),
+              OrdersScreen.routeName: (ctx) => OrdersScreen(),
+              UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+              EditProductScreen.rotueName: (ctx) => EditProductScreen(),
+            },
+          ),
+        ));
   }
 }
