@@ -22,12 +22,12 @@ class Product with ChangeNotifier {
 
 
 //we use optimistic update = if the server doesn't get updated, we revert the value on the screen to it's initial value (ex: if we mark an item as favourite, if the server doesnt't get updated, we throw a error, and then revert the item as not favourite)
-  Future<void> toggleFavouriteStatus() async {
+  Future<void> toggleFavouriteStatus(String token) async {
     var oldStatus =
         isFavourite; //store the value in the momory, in case the server doeasn't get updated, to restore it
     isFavourite = !isFavourite;
     notifyListeners(); //inform all the listeners that are listening to this, that the parameter has changed
-    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json';
+    final url = 'https://shopapp-9c0d8.firebaseio.com/products/$id.json?auth=$token';
     try {
       final response = await http.patch(
         url,

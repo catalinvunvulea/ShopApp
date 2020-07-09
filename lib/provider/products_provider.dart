@@ -73,8 +73,8 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     //returns  void Future, and async
-    const url =
-        'https://shopapp-9c0d8.firebaseio.com/products.json'; //url from where we wish to get the data
+    final url =
+        'https://shopapp-9c0d8.firebaseio.com/products.json?auth=$authToken'; //url from where we wish to get the data; ?auth=$authToken - acces the token to be authenticated with user
     try {
       //as the following code maight give an error
       final response = await http.get(
@@ -110,7 +110,7 @@ class Products with ChangeNotifier {
   Future<void> addProduct(Product product) async {
     //instead of future we can use async, it will always return a future(this is <void>)
     //(if future used)to add a spinner once we add a new product, untill the data is available, we will return a Future
-    const url = 'https://shopapp-9c0d8.firebaseio.com/products.json';
+    final url = 'https://shopapp-9c0d8.firebaseio.com/products.json?auth=$authToken';
     try {
       //part of async, wrap the code that might fail to catch the error
 
@@ -172,7 +172,7 @@ class Products with ChangeNotifier {
     if (prodIndex > 0) {
       //we check to ensure we have a index (have found a product with that id), not requiered in our app
       final url =
-          'https://shopapp-9c0d8.firebaseio.com/products/$id.json'; // adding / after product will dive further in the data base; we interpolate the id form the argument (hence url is no longer const but final)
+          'https://shopapp-9c0d8.firebaseio.com/products/$id.json?auth=$authToken'; // adding / after product will dive further in the data base; we interpolate the id form the argument (hence url is no longer const but final)
       await http.patch(
           url, //patch = modify existing data on firebase; url = location, body = content
           body: json.encode({

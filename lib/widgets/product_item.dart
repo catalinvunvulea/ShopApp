@@ -1,3 +1,4 @@
+import 'package:ShopApp/provider/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +23,7 @@ class ProductItem extends StatelessWidget {
     final cart = Provider.of<Cart>(context,
         listen:
             false); // listen = false => I am not interested to rebuilt the screen when changes occur
+    final authData = Provider.of<Auth>(context, listen: false).token;
 
     return ClipRRect(
       //used to force borderRadius to all it's children
@@ -49,7 +51,7 @@ class ProductItem extends StatelessWidget {
                   product.isFavourite ? Icons.favorite : Icons.favorite_border,
                 ),
                 onPressed: () {
-                  product.toggleFavouriteStatus();
+                  product.toggleFavouriteStatus(authData);
                 },
               ),
             ),
