@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
             create: (ctx) => Auth(),
           ),
           ChangeNotifierProxyProvider<Auth, Products>( //ProxyProvider alows you to set a provider which iteslf depends on another provider whihc was defined before this one (code before, like Auth) <Auth - data from where you provide, Products - data where you provide)
-            update: (ctx, auth, previousProducts) => Products(auth.token, previousProducts == null ? [] : previousProducts.items), //now we have an instance of Products class which applyes to all it's child and his children (MaterialApp is the child - the route of the app, but extends to it's children, who can now also have listeners)
+            update: (ctx, auth, previousProducts) => Products(auth.token, auth.userId, previousProducts == null ? [] : previousProducts.items), //now we have an instance of Products class which applyes to all it's child and his children (MaterialApp is the child - the route of the app, but extends to it's children, who can now also have listeners)
           ),
           ChangeNotifierProvider(
             create: (ctx) => Cart(),

@@ -53,8 +53,9 @@ class Products with ChangeNotifier {
 
   //var _showFavouritesOnly = false;
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get items {
     // if (_showFavouritesOnly) {
@@ -73,7 +74,7 @@ class Products with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     //returns  void Future, and async
-    final url =
+    var url =
         'https://shopapp-9c0d8.firebaseio.com/products.json?auth=$authToken'; //url from where we wish to get the data; ?auth=$authToken - acces the token to be authenticated with user
     try {
       //as the following code maight give an error
@@ -85,16 +86,20 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return; //stop code if we don't ave products on the server
       }
-      extractedData.forEach((key, value) {
+      url = 'https://shopapp-9c0d8.firebaseio.com/userFavourites/$userId.json?auth=$authToken';
+
+    final favouriteResponse = await http.get(url);
+    final favouriteData = json.decode(favouriteResponse.body);
+      extractedData.forEach((prodId, value) {
         //extractData = Map hence .forEach (key, value)
         loadedProducts.add(
           //we populate our product with the data from server
           Product(
-            id: key,
+            id: prodId,
             title: value['title'],
             description: value['description'],
             price: value['price'],
-            isFavourite: value['isFavourite'],
+            isFavourite: favouriteData == null ? false : favouriteData[prodId] ?? false, //?? checks if favouriteData[prodId] is null, and return the value after (false) if it is
             imageUrl: value['imageUrl'],
           ),
         );
@@ -124,7 +129,6 @@ class Products with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
-          'isFavourite': product.isFavourite,
         }),
       );
       //this will run only if the above code succeed

@@ -15,6 +15,9 @@ class Auth with ChangeNotifier {
     return token !=
         null; //if token (the getter) is not = null, we return true (we are authenticated) otherwise false
   }
+  String get userId {
+    return _userId;
+  }
 
   String get token {
     if (_expiryDate != null &&

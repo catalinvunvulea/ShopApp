@@ -23,7 +23,7 @@ class ProductItem extends StatelessWidget {
     final cart = Provider.of<Cart>(context,
         listen:
             false); // listen = false => I am not interested to rebuilt the screen when changes occur
-    final authData = Provider.of<Auth>(context, listen: false).token;
+    final authData = Provider.of<Auth>(context, listen: false);
 
     return ClipRRect(
       //used to force borderRadius to all it's children
@@ -51,7 +51,10 @@ class ProductItem extends StatelessWidget {
                   product.isFavourite ? Icons.favorite : Icons.favorite_border,
                 ),
                 onPressed: () {
-                  product.toggleFavouriteStatus(authData);
+                  product.toggleFavouriteStatus(
+                    authData.token,
+                    authData.userId,
+                  );
                 },
               ),
             ),
@@ -65,7 +68,8 @@ class ProductItem extends StatelessWidget {
               icon: Icon(Icons.shopping_cart),
               onPressed: () {
                 cart.addItem(product.id, product.price, product.title);
-                Scaffold.of(context).hideCurrentSnackBar(); //hide SnackBar before show the new one
+                Scaffold.of(context)
+                    .hideCurrentSnackBar(); //hide SnackBar before show the new one
                 Scaffold.of(context).showSnackBar(
                   //establish a conneciton to the nearest widget that controll the entire screen (not just the one of the widget ProductItem), in this case is the Scaffold from the ProductsOverviewScreen
                   SnackBar(
