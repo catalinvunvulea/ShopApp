@@ -13,12 +13,13 @@ class Orders with ChangeNotifier {
   }
 
   final String authToken;
+  final String userId;
 
-  Orders(this.authToken, this._orders);
+  Orders(this.authToken, this.userId, this._orders);
 
   Future<void> addOrder(List<CartItemM> cartProducts, double total) async {
     final url =
-        'https://shopapp-9c0d8.firebaseio.com/orders.json?auth=$authToken'; //ading /orders creates a new node/folder(if not created already) on firebase (other servers may work different)
+        'https://shopapp-9c0d8.firebaseio.com/orders/$userId.json?auth=$authToken'; //ading /orders creates a new node/folder(if not created already) on firebase (other servers may work different)
     final timeStampe = DateTime
         .now(); //store it here as we wish to have the same date locally and on the server
     final response = await http.post(
@@ -52,7 +53,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> setAndFetchOrders() async {
-    final url = 'https://shopapp-9c0d8.firebaseio.com/orders.json?auth=$authToken';
+    final url = 'https://shopapp-9c0d8.firebaseio.com/orders/$userId.json?auth=$authToken';
     final response = await http.get(url);
     final List<OrderItemM> loadedOrders = [];
     final extractedData = json.decode(response.body) as Map<String,
