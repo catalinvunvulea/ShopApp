@@ -72,12 +72,13 @@ class Products with ChangeNotifier {
     return _items.where((element) => element.isFavourite).toList();
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async { //[] makes the argument optional but initial value has to be provided; bool use to display all products on shop and only user products in manage
     //returns  void Future, and async
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : ''; //if filterByUser true, we modify the link to fetch only products created by user (ex when we manage products)
     var url =
-        'https://shopapp-9c0d8.firebaseio.com/products.json?auth=$authToken'; //url from where we wish to get the data; ?auth=$authToken - acces the token to be authenticated with user
+        'https://shopapp-9c0d8.firebaseio.com/products.json?auth=$authToken&$filterString'; //url from where we wish to get the data; ?auth=$authToken - acces the token to be authenticated with user; as we should filter the products we want ot fetch on the server we add "F708BszrZAOCcd2O9dp00Tony9P2"
     try {
-      //as the following code maight give an error
+      //as the following code might give an error
       final response = await http.get(
           url); //http only becaus we added "as http" in the import; get=get data from
       final extractedData = json.decode(response.body) as Map<String,
@@ -129,6 +130,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'price': product.price,
           'imageUrl': product.imageUrl,
+          'creatorId': userId
         }),
       );
       //this will run only if the above code succeed

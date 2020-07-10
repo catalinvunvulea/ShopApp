@@ -90,7 +90,7 @@ class Auth with ChangeNotifier {
         throw HttpException(responseData['error']
             ['message']); //we throw the message that is received from firebase
       }
-      _token = responseData['idToken']; //idToken - name form firebase
+      _token = responseData['idToken']; //idToken - name from firebase
       _userId = responseData['localId'];
       _expiryDate = DateTime.now().add(
         Duration(

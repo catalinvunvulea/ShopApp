@@ -92,8 +92,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
           (!_imageUrlController.text.endsWith('.jpeg'))) {
         return; //we set state (reload screen) only if link contains an immage
       }
-      setState(() {});
+     // setState(() {});
     }
+    setState(() {});
   }
 
   Future<void> _saveForm() async {
