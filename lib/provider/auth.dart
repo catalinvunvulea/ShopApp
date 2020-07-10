@@ -1,4 +1,5 @@
 import 'dart:convert'; //enable us to use json.encode
+import 'dart:async'; //to set a timer
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +11,8 @@ class Auth with ChangeNotifier {
       _token; //tokens usually expire; on firebase after 1 h, hence it's good to have a date var'
   DateTime _expiryDate;
   String _userId;
+
+  Timer _authTimer;
 
   bool get isAuth {
     return token !=
@@ -98,16 +101,29 @@ class Auth with ChangeNotifier {
               'expiresIn']), //from firebase, we receive a string of number of seconds untill the token expires; here we use now time to add the no of seconds (convert them to int) and calculate the exact date, time, hour, min, sec when the token will expire
         ),
       );
+      _autoLogot();
       notifyListeners(); //we wish to trigger the Consumer from Main, to rebuilt, and chose which screen to show
     } catch (error) {
       throw error;
     }
   }
 
-  void logOut() {
+  void logout() {
     _token = null;
     _userId = null;
     _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
     notifyListeners();
+  }
+
+  void _autoLogot() {
+    if (_authTimer != null) { //we verivy if there is alredy a timmer on the screen, and if there is, we cancel it
+      _authTimer.cancel();
+    }
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
