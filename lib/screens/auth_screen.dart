@@ -215,7 +215,7 @@ class _AuthCardState extends State<AuthCard>
       setState(() {
         _authMode = AuthMode.Login;
       });
-      _controller.reverse();//reverse animation to initial height
+      _controller.reverse(); //reverse animation to initial height
     }
   }
 
@@ -227,13 +227,17 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 20.0,
-      child: Container(
-        // height: _authMode == AuthMode.Signup ? 320 : 260,
-        height: _heightAnimation.value.height,
-        constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
-        child: Form(
+      child: AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (ctx, childX) => Container( //builder is the widget that will animate
+          // height: _authMode == AuthMode.Signup ? 320 : 260,
+          height: _heightAnimation.value.height,
+          constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
+          width: deviceSize.width * 0.75,
+          padding: EdgeInsets.all(16.0),
+          child: childX, //child is the widget that won't rebuild for every frame (60 fps); it is the child of the container which is the form (see below)
+        ),
+        child: Form( 
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
