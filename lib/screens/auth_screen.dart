@@ -111,26 +111,36 @@ class _AuthCardState extends State<AuthCard>
   final _passwordController = TextEditingController();
 
   AnimationController _controller; //use to start or revert the animaiton
-  Animation<Size>
-      _heightAnimation; //animation itself with will change the value in time
+  Animation<Offset>
+      _slideAnimation; //animation itself with will change the value in time
+
+  Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this,
-        duration: Duration(
-            milliseconds:
-                300)); //vsync give a pointer to the object/widget we apply the animation, and only if that is visible to the user, animation can run
-    _heightAnimation = Tween<Size>(
-            begin: Size(double.infinity, 260), end: Size(double.infinity, 320))
-        .animate(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 300,
+      ),
+    ); //vsync give a pointer to the object/widget we apply the animation, and only if that is visible to the user, animation can run
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -0.5),
+      end: Offset(0, 0),
+    ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.linear,
+        curve: Curves.fastOutSlowIn,
       ),
     );
-    _heightAnimation.addListener(() => setState(() {}));
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.linearToEaseOut,
+      ),
+    );
+    _slideAnimation.addListener(() => setState(() {}));
   }
 
   @override
@@ -227,15 +237,21 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 20.0,
-      child:  AnimatedContainer( //no need to add a builder, and we can use the previous data (heigh)
-          duration: Duration(milliseconds: 300), //for animated container we need to add the duration and curve
-          curve: Curves.linear, //how quick to begin and end the animation; speed along the curve
-           height: _authMode == AuthMode.Signup ? 320 : 260,
+      child: AnimatedContainer(
+        //no need to add a builder, and we can use the previous data (heigh)
+        duration: Duration(
+            milliseconds:
+                300), //for animated container we need to add the duration and curve
+        curve: Curves
+            .linear, //how quick to begin and end the animation; speed along the curve
+        height: _authMode == AuthMode.Signup ? 320 : 260,
         //  height: _heightAnimation.value.height,
-          constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
-          width: deviceSize.width * 0.75,
-          padding: EdgeInsets.all(16.0),
-        child: Form( 
+        constraints: BoxConstraints(
+          minHeight: _authMode == AuthMode.Signup ? 320 : 260,
+        ),
+        width: deviceSize.width * 0.75,
+        padding: EdgeInsets.all(16.0),
+        child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
@@ -252,6 +268,7 @@ class _AuthCardState extends State<AuthCard>
                     _authData['email'] = value;
                   },
                 ),
+
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Password'),
                   obscureText: true,
@@ -265,19 +282,36 @@ class _AuthCardState extends State<AuthCard>
                     _authData['password'] = value;
                   },
                 ),
-                if (_authMode == AuthMode.Signup)
-                  TextFormField(
-                    enabled: _authMode == AuthMode.Signup,
-                    decoration: InputDecoration(labelText: 'Confirm Password'),
-                    obscureText: true, //hide the text input ****
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                          }
-                        : null,
+
+                // if (_authMode == AuthMode.Signup)
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  constraints: BoxConstraints(
+                    minHeight: _authMode == AuthMode.Signup ? 50 : 0,
+                    maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
                   ),
+                  curve: Curves.easeIn,
+                  child: FadeTransition(
+                    // this has to be wrapped in an AnimatedContainer otherwise it will keep his height even though it's not visible
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: TextFormField(
+                        enabled: _authMode == AuthMode.Signup,
+                        decoration:
+                            InputDecoration(labelText: 'Confirm Password'),
+                        obscureText: true, //hide the text input ****
+                        validator: _authMode == AuthMode.Signup
+                            ? (value) {
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match!';
+                                }
+                              }
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 20,
                 ),
