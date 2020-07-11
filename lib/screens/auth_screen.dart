@@ -227,16 +227,14 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(15.0),
       ),
       elevation: 20.0,
-      child: AnimatedBuilder(
-        animation: _heightAnimation,
-        builder: (ctx, childX) => Container( //builder is the widget that will animate
-          // height: _authMode == AuthMode.Signup ? 320 : 260,
-          height: _heightAnimation.value.height,
+      child:  AnimatedContainer( //no need to add a builder, and we can use the previous data (heigh)
+          duration: Duration(milliseconds: 300), //for animated container we need to add the duration and curve
+          curve: Curves.linear, //how quick to begin and end the animation; speed along the curve
+           height: _authMode == AuthMode.Signup ? 320 : 260,
+        //  height: _heightAnimation.value.height,
           constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
           width: deviceSize.width * 0.75,
           padding: EdgeInsets.all(16.0),
-          child: childX, //child is the widget that won't rebuild for every frame (60 fps); it is the child of the container which is the form (see below)
-        ),
         child: Form( 
           key: _formKey,
           child: SingleChildScrollView(
