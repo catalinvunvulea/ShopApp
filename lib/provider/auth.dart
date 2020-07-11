@@ -130,7 +130,7 @@ class Auth with ChangeNotifier {
     }
     //if we do get something, we will extract the data
     final extractedUserData = json.decode(prefs.getString('userData'))
-        as Map; //prefs.getString('userData') returns a string hence we use json.decode as Map
+        as Map<String, Object>; //prefs.getString('userData') returns a string hence we use json.decode as Map
     final expiryDate = DateTime.parse(extractedUserData['exiryDate']);
     if (expiryDate.isBefore(DateTime.now())) {
       //check if the token is still valid
@@ -145,15 +145,19 @@ class Auth with ChangeNotifier {
     return true;
   }
 
-  void logout() {
+  void logout() async {
     _token = null;
     _userId = null;
     _expiryDate = null;
+     
     if (_authTimer != null) {
       _authTimer.cancel();
       _authTimer = null;
     }
     notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('userData');
+    //prefs.clear //to delete all stored data, but sometimes we wish to keep something and we should target what to remove, using  prefs.remove('userData'); for us, clear would work fine as we only store one data
   }
 
   void _autoLogot() {

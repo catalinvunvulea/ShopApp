@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; //enable us to set a provider
 
+import './widgets/splash_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/user_products_screen.dart';
 import 'package:ShopApp/provider/auth.dart';
@@ -58,7 +59,10 @@ class MyApp extends StatelessWidget {
             ),
             home: auth.isAuth
                 ? ProductsOverviewScreen()
-                : AuthScreen(), // if we are authenticated, we shot the ProductOS otherwie the AuthScreen
+                : FutureBuilder(
+                    future: auth.tryAutoLogin(),
+                    builder: (ctx, authResultSnapshot) => authResultSnapshot.connectionState == ConnectionState.waiting ? SplashScreen() : AuthScreen(),
+                  ), // if we are authenticated, we show the Products therwise the AuthScreen
             routes: {
               ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
               CartScreen.routeName: (ctx) => CartScreen(),
