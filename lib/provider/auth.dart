@@ -4,6 +4,8 @@ import 'dart:async'; //to set a timer
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../model/http_exception.dart';
 
 class Auth with ChangeNotifier {
@@ -18,6 +20,7 @@ class Auth with ChangeNotifier {
     return token !=
         null; //if token (the getter) is not = null, we return true (we are authenticated) otherwise false
   }
+
   String get userId {
     return _userId;
   }
@@ -103,9 +106,43 @@ class Auth with ChangeNotifier {
       );
       _autoLogot();
       notifyListeners(); //we wish to trigger the Consumer from Main, to rebuilt, and chose which screen to show
+      final prefs = await SharedPreferences
+          .getInstance(); //this return a future, hence awiat, as w edon't want to store a future in prefs but a value
+      final userData = json.encode({
+        //we use json as we wish to store a map
+        'token': _token,
+        'userId': _userId,
+        'exiryDate': _expiryDate.toIso8601String(),
+      });
+      prefs.setString('userData',
+          userData); //we store the data on the device (with a key, and as Data we reated a Map using the json)
     } catch (error) {
       throw error;
     }
+  }
+
+  Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences
+        .getInstance(); //we fetch the data (it can be empty)
+    if (!prefs.containsKey('userData')) {
+      //if the prefs don't contain a key with that name, we return false
+      return false;
+    }
+    //if we do get something, we will extract the data
+    final extractedUserData = json.decode(prefs.getString('userData'))
+        as Map; //prefs.getString('userData') returns a string hence we use json.decode as Map
+    final expiryDate = DateTime.parse(extractedUserData['exiryDate']);
+    if (expiryDate.isBefore(DateTime.now())) {
+      //check if the token is still valid
+      return false;
+    }
+    //if the token is still valid, we can use the extracted data
+    _token = extractedUserData['token'];
+    _userId = extractedUserData['userId'];
+    _expiryDate = expiryDate;
+    notifyListeners();
+    _autoLogot(); //to set the timmer
+    return true;
   }
 
   void logout() {
@@ -120,7 +157,8 @@ class Auth with ChangeNotifier {
   }
 
   void _autoLogot() {
-    if (_authTimer != null) { //we verivy if there is alredy a timmer on the screen, and if there is, we cancel it
+    if (_authTimer != null) {
+      //we verivy if there is alredy a timmer on the screen, and if there is, we cancel it
       _authTimer.cancel();
     }
     final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
