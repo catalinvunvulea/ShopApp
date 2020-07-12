@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; //enable us to set a provider
 
@@ -13,6 +15,7 @@ import './provider/cart_provider.dart';
 import './provider/orders_provider.dart';
 import './screens/orders_screen.dart';
 import './screens/auth_screen.dart';
+import './helpers/custom_route.dart';
 
 void main() {
   runApp(MyApp());
@@ -56,6 +59,11 @@ class MyApp extends StatelessWidget {
               accentColor: Colors.deepOrange,
               fontFamily: 'Lato',
               visualDensity: VisualDensity.adaptivePlatformDensity,
+              pageTransitionsTheme: PageTransitionsTheme(builders: { // if we made a custom transiiton between screens
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(), // could use a different one for iOS
+              })
+              
             ),
             home: auth.isAuth
                 ? ProductsOverviewScreen()
