@@ -33,7 +33,12 @@ class ProductDetailScreen extends StatelessWidget {
             pinned:
                 true, //app bar will always be visible and will not scroll out off the view
             flexibleSpace: FlexibleSpaceBar(
-              title: Container(decoration: BoxDecoration(color: Colors.purple) ,child: Text(loadedProduct.title)),
+              title: Container(
+                decoration: BoxDecoration(color: Colors.purple),
+                child: Text(
+                  loadedProduct.title,
+                ),
+              ),
               background: Hero(
                 // used on the previous screen, and needs to be used here as well; use the same tag
                 tag: loadedProduct.id,
@@ -53,7 +58,7 @@ class ProductDetailScreen extends StatelessWidget {
                     color: Colors.grey,
                     fontSize: 25,
                     fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: 10),
               Container(
@@ -67,7 +72,9 @@ class ProductDetailScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 800) // added only to make a longer screen to be able to see customScrollView (if description of the product would be longer)
+              SizedBox(
+                  height:
+                      800) // added only to make a longer screen to be able to see customScrollView (if description of the product would be longer)
             ]),
           ),
         ],
