@@ -36,10 +36,14 @@ class ProductItem extends StatelessWidget {
               arguments: product.id,
             );
           },
-          child: FadeInImage( // used to show an immage before the desired image is loaded
-            placeholder: AssetImage('assets/images/product-placeholder.png'),
-            image: NetworkImage(product.imageUrl),
-            fit: BoxFit.cover,
+          child: Hero( //animation; when transition to the next screen is happening, the selected image wil animate - increase in size
+            tag: product.id, //needs a unique tag of the immage that is loaded
+            child: FadeInImage(
+              // used to show an immage before the desired image is loaded
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         footer: Container(
